@@ -1,0 +1,15 @@
+// Prisma ORM 7 client — Rust-free runtime, wired to PostgreSQL via the
+// node-postgres driver adapter (@prisma/adapter-pg).
+import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaClient } from '../../generated/prisma/client'
+
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL })
+
+// Reuse a single client across hot-reloads / server invocations.
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient }
+
+export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter })
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
+}

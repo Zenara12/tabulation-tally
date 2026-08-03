@@ -1,0 +1,119 @@
+// Tabulation System — Prisma schema
+// Prisma ORM 7 (Rust-free client, adapter-based)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+// In Prisma 7 the connection URL is no longer set here.
+// It lives in prisma.config.ts (datasource.url) for CLI/Migrate,
+// and is passed via @prisma/adapter-pg at runtime (see server/utils/prisma.ts).
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  JUDGE
+}
+
+enum EventStatus {
+  DRAFT
+  OPEN
+  CLOSED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(JUDGE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  judgeAssignments EventJudge[]
+  scores           Score[]
+
+  @@map("users")
+}
+
+model Event {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  status      EventStatus @default(DRAFT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  criterias   Criteria[]
+  contestants Contestant[]
+  judges      EventJudge[]
+  scores      Score[]
+
+  @@map("events")
+}
+
+/// Join table assigning Judges to an Event
+model EventJudge {
+  id        String   @id @default(cuid())
+  eventId   String
+  judgeId   String
+  createdAt DateTime @default(now())
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  judge User  @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, judgeId])
+  @@map("event_judges")
+}
+
+model Criteria {
+  id        String   @id @default(cuid())
+  eventId   String
+  name      String
+  weight    Float    @default(0)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+
+  event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  scores Score[]
+
+  @@map("criterias")
+}
+
+model Contestant {
+  id        String   @id @default(cuid())
+  eventId   String
+  number    Int
+  name      String
+  photoUrl  String?
+  createdAt DateTime @default(now())
+
+  event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  scores Score[]
+
+  @@unique([eventId, number])
+  @@map("contestants")
+}
+
+model Score {
+  id           String   @id @default(cuid())
+  eventId      String
+  judgeId      String
+  contestantId String
+  criteriaId   String
+  score        Float
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  judge      User       @relation(fields: [judgeId], references: [id], onDelete: Cascade)
+  contestant Contestant @relation(fields: [contestantId], references: [id], onDelete: Cascade)
+  criteria   Criteria   @relation(fields: [criteriaId], references: [id], onDelete: Cascade)
+
+  // Prevents duplicate scoring: one score per judge per contestant per criteria per event
+  @@unique([eventId, judgeId, contestantId, criteriaId])
+  @@map("scores")
+}

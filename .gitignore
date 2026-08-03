@@ -1,0 +1,27 @@
+# Nuxt
+.nuxt/
+.output/
+dist/
+.cache/
+
+# Environment (never commit secrets)
+.env
+!.env.example
+
+# Dependencies
+node_modules/
+
+# Prisma generated client
+generated/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
