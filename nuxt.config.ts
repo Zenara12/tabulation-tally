@@ -13,6 +13,14 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
 
+  runtimeConfig: {
+    session: {
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
+
   app: {
     head: {
       title: 'Tabulation System',
