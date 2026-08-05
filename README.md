@@ -179,3 +179,87 @@ npm run db:reset        # Reset DB + re-run all migrations (dev only!)
 **Database:** [Neon](https://neon.tech), [Supabase](https://supabase.com), [Railway](https://railway.app), or self-hosted PostgreSQL
 
 Set `DATABASE_URL` and `NUXT_SESSION_PASSWORD` as environment variables in your deployment platform.
+
+---
+
+## Docker Setup
+
+The project ships with a full Docker setup: a multi-stage Dockerfile for the Nuxt app and a Docker Compose file that wires it to PostgreSQL 17.
+
+### Files added
+
+```
+Dockerfile                    Multi-stage build (builder → slim runner)
+docker-compose.yml            Production: app + postgres
+docker-compose.dev.yml        Dev: postgres only (Nuxt runs on host)
+docker/entrypoint.sh          Waits for DB → runs migrations → starts server
+.env.production.example       Template for production secrets
+.dockerignore                 Keeps image builds fast and clean
+server/api/health.get.ts      GET /api/health — DB ping for healthcheck
+```
+
+### Production deployment
+
+```bash
+# 1. Copy and fill in secrets
+cp .env.production.example .env.production
+# Edit POSTGRES_PASSWORD and NUXT_SESSION_PASSWORD
+
+# 2. Build and start (detached)
+npm run docker:build
+npm run docker:up
+
+# 3. Seed the first admin account (first deploy only)
+docker exec tabulation_app npx tsx prisma/seed.ts
+
+# 4. Check logs
+npm run docker:logs
+```
+
+The app will be available on `http://<your-server-ip>:3000`.
+
+### What happens on startup
+
+The entrypoint script (`docker/entrypoint.sh`) runs automatically inside the container:
+
+1. Waits for PostgreSQL to accept connections (retries up to 30×, 2 s apart)
+2. Runs `prisma migrate deploy` — applies any pending migrations safely
+3. Starts the Nuxt/Nitro server with `node .output/server/index.mjs`
+
+Migrations are safe to run on every deploy — Prisma skips already-applied ones.
+
+### Development: DB in Docker, Nuxt on host
+
+If you just want PostgreSQL containerized and run Nuxt normally:
+
+```bash
+npm run docker:dev          # starts postgres on localhost:5432
+# .env DATABASE_URL should point to localhost:5432
+npm run db:migrate
+npm run db:seed
+npm run dev
+```
+
+### Useful Docker commands
+
+```bash
+npm run docker:logs         # tail all logs
+npm run docker:down         # stop and remove containers
+
+docker exec tabulation_app npx prisma migrate deploy   # manual migration
+docker exec -it tabulation_db psql -U tabulation tabulation_db  # psql shell
+```
+
+### Cookie security in production
+
+In production (`NODE_ENV=production`), session cookies are automatically set to `Secure: true`.
+This means your app **must be served over HTTPS** for logins to work.
+
+Recommended: put an Nginx or Caddy reverse proxy in front that handles TLS, then proxy to `localhost:3000`.
+
+Quick Caddy example (auto-HTTPS):
+```
+yourdomain.com {
+  reverse_proxy localhost:3000
+}
+```

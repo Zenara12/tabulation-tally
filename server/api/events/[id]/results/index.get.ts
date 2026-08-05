@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
   ])
 
   const totalWeight = criterias.reduce((sum, c) => sum + c.weight, 0)
-  
+
   const results = contestants.map((contestant) => {
     const criteriaBreakdown = criterias.map((criteria) => {
       const relevant = scores.filter(
@@ -22,6 +22,7 @@ export default defineEventHandler(async (event) => {
       const average = relevant.length
         ? relevant.reduce((sum, s) => sum + s.score, 0) / relevant.length
         : null
+
       return {
         criteriaId: criteria.id,
         criteriaName: criteria.name,
@@ -31,7 +32,7 @@ export default defineEventHandler(async (event) => {
         weighted: average !== null ? (average * criteria.weight) / 100 : 0,
       }
     })
-    console.log('criteriaBreakdown', criteriaBreakdown)
+
     const weightedTotal = criteriaBreakdown.reduce((sum, c) => sum + c.weighted, 0)
     const scoresSubmitted = scores.filter((s) => s.contestantId === contestant.id).length
     const scoresExpected = criterias.length * judges.length
