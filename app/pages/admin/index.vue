@@ -1,6 +1,6 @@
 <template>
-  <div class="px-10 py-10 max-w-5xl">
-    <div class="flex items-start justify-between mb-8">
+  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
         <h1 class="font-display text-3xl text-ink">Events</h1>
         <p class="text-sm text-slate mt-1">Create and manage tabulation events.</p>
@@ -24,7 +24,7 @@
         v-for="evt in events"
         :key="evt.id"
         :to="`/admin/events/${evt.id}`"
-        class="flex items-center justify-between rounded-lg border border-ink/10 bg-white px-5 py-4 hover:border-brass/60 hover:shadow-sm transition-all"
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-ink/10 bg-white px-5 py-4 hover:border-brass/60 hover:shadow-sm transition-all"
       >
         <div>
           <div class="flex items-center gap-2.5">
@@ -36,7 +36,7 @@
           </div>
           <p v-if="evt.description" class="text-sm text-slate mt-0.5">{{ evt.description }}</p>
         </div>
-        <div class="flex gap-6 text-sm tabular text-slate shrink-0">
+        <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm tabular text-slate shrink-0">
           <span>{{ evt._count.contestants }} contestants</span>
           <span>{{ evt._count.criterias }} criteria</span>
           <span>{{ evt._count.judges }} judges</span>

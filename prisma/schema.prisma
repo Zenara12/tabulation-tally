@@ -84,12 +84,14 @@ model Criteria {
 }
 
 model Contestant {
-  id        String   @id @default(cuid())
-  eventId   String
-  number    Int
-  name      String
-  photoUrl  String?
-  createdAt DateTime @default(now())
+  id                String   @id @default(cuid())
+  eventId           String
+  number            Int      // auto-assigned server-side (max existing + 1 per event)
+  name              String
+  alias             String?  // cosplayer alias / performer alias
+  characterName     String?  // character or title being portrayed
+  cosplayPictureUrl String?  // base64 data-URL or remote URL of reference image
+  createdAt         DateTime @default(now())
 
   event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
   scores Score[]

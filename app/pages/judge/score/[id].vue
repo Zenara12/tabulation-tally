@@ -1,14 +1,14 @@
 <template>
-  <div class="px-10 py-10 max-w-5xl">
-    <div v-if="pending" class="text-sm text-slate">Loading event…</div>
+  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+    <div v-if="pending" class="text-sm text-slate">Loading event...</div>
 
     <template v-else-if="event">
       <div class="mb-6">
-        <NuxtLink to="/judge" class="text-xs text-slate hover:text-ink">← Assigned events</NuxtLink>
-        <div class="flex items-center gap-3 mt-1">
+        <NuxtLink to="/judge" class="text-xs text-slate hover:text-ink">Back to assigned events</NuxtLink>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3 mt-1">
           <h1 class="font-display text-3xl text-ink">{{ event.name }}</h1>
           <span
-            class="text-[10px] uppercase tracking-wider font-medium rounded-full px-2 py-0.5"
+            class="text-[10px] uppercase tracking-wider font-medium rounded-full px-2 py-0.5 w-fit"
             :class="statusClass(event.status)"
           >{{ event.status }}</span>
         </div>
@@ -27,8 +27,8 @@
 
       <!-- Scoring grid -->
       <template v-else>
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-4 text-sm text-slate">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate">
             <span>{{ contestants.length }} contestants</span>
             <span>{{ criterias.length }} criteria</span>
           </div>
@@ -39,7 +39,7 @@
               class="rounded-md bg-teal text-paper text-sm font-medium px-4 py-2 hover:bg-teal-soft disabled:opacity-60 transition-colors"
               @click="saveAll"
             >
-              {{ saving ? 'Saving…' : 'Save scores' }}
+              {{ saving ? 'Saving...' : 'Save scores' }}
             </button>
           </div>
         </div>
@@ -60,11 +60,11 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm border-collapse">
+        <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
+          <table class="w-full min-w-[860px] text-sm border-collapse">
             <thead>
               <tr>
-                <th class="text-left py-3 pr-4 font-medium text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10 w-48">
+                <th class="text-left py-3 pr-4 font-medium text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10 w-56">
                   Contestant
                 </th>
                 <th
@@ -80,8 +80,24 @@
             <tbody>
               <tr v-for="contestant in contestants" :key="contestant.id" class="border-b border-ink/5 group">
                 <td class="py-3 pr-4">
-                  <span class="font-medium text-ink">{{ contestant.name }}</span>
-                  <span class="block text-xs tabular text-slate-soft">No. {{ contestant.number }}</span>
+                  <div class="flex items-start gap-3">
+                    <img
+                      v-if="contestant.cosplayPictureUrl"
+                      :src="contestant.cosplayPictureUrl"
+                      class="w-10 h-10 rounded object-cover border border-ink/10 shrink-0"
+                      :alt="contestant.characterName || contestant.alias || contestant.name"
+                    >
+                    <div>
+                      <span class="font-medium text-ink">{{ contestant.name }}</span>
+                      <span class="block text-xs tabular text-slate-soft">No. {{ contestant.number }}</span>
+                      <span v-if="contestant.alias" class="block text-[10px] text-slate-soft/70 truncate max-w-[180px]">
+                        Alias: {{ contestant.alias }}
+                      </span>
+                      <span v-if="contestant.characterName" class="block text-[10px] text-slate-soft/70 truncate max-w-[180px]">
+                        Character: {{ contestant.characterName }}
+                      </span>
+                    </div>
+                  </div>
                 </td>
                 <td v-for="criteria in criterias" :key="criteria.id" class="py-2 px-2">
                   <input
@@ -94,7 +110,7 @@
                     :class="hasScore(contestant.id, criteria.id)
                       ? 'border-teal/30 bg-teal/5 text-ink'
                       : 'border-ink/15 bg-white text-ink'"
-                    placeholder="—"
+                    placeholder="-"
                     @change="setScore(contestant.id, criteria.id, Number(($event.target as HTMLInputElement).value))"
                   >
                 </td>
@@ -109,7 +125,7 @@
             class="rounded-md bg-teal text-paper text-sm font-medium px-6 py-2.5 hover:bg-teal-soft disabled:opacity-60 transition-colors"
             @click="saveAll"
           >
-            {{ saving ? 'Saving…' : 'Save all scores' }}
+            {{ saving ? 'Saving...' : 'Save all scores' }}
           </button>
         </div>
       </template>
