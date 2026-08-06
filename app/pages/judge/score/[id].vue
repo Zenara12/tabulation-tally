@@ -84,8 +84,13 @@
                     <img
                       v-if="contestant.cosplayPictureUrl"
                       :src="contestant.cosplayPictureUrl"
-                      class="w-10 h-10 rounded object-cover border border-ink/10 shrink-0"
+                      class="w-10 h-10 rounded object-cover border border-ink/10 shrink-0 cursor-zoom-in"
                       :alt="contestant.characterName || contestant.alias || contestant.name"
+                      role="button"
+                      tabindex="0"
+                      @click="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
+                      @keydown.enter.prevent="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
+                      @keydown.space.prevent="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
                     >
                     <div>
                       <span class="font-medium text-ink">{{ contestant.name }}</span>
@@ -129,6 +134,37 @@
           </button>
         </div>
       </template>
+
+      <Teleport to="body">
+        <div
+          v-if="previewImage"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 px-4 py-6"
+          @click.self="closeImage"
+        >
+          <div class="relative w-full max-w-4xl rounded-2xl bg-paper shadow-2xl overflow-hidden">
+            <div class="flex items-center justify-between gap-4 border-b border-ink/10 px-4 py-3">
+              <div>
+                <p class="font-medium text-ink">Reference image</p>
+                <p class="text-xs text-slate">{{ previewLabel }}</p>
+              </div>
+              <button
+                type="button"
+                class="rounded-md px-3 py-1.5 text-sm font-medium text-slate hover:text-ink hover:bg-ink/5 transition-colors"
+                @click="closeImage"
+              >
+                Close
+              </button>
+            </div>
+            <div class="bg-black flex items-center justify-center p-3 sm:p-6">
+              <img
+                :src="previewImage"
+                :alt="previewLabel"
+                class="max-h-[80vh] w-full object-contain rounded-lg"
+              >
+            </div>
+          </div>
+        </div>
+      </Teleport>
     </template>
   </div>
 </template>
@@ -180,6 +216,32 @@ function setScore(contestantId: string, criteriaId: string, value: number) {
 const saving = ref(false)
 const saveError = ref('')
 const savedAt = ref('')
+const previewImage = ref('')
+const previewLabel = ref('')
+
+function openImage(src: string, label: string) {
+  previewImage.value = src
+  previewLabel.value = label
+}
+
+function closeImage() {
+  previewImage.value = ''
+  previewLabel.value = ''
+}
+
+function handlePreviewKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && previewImage.value) {
+    closeImage()
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handlePreviewKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handlePreviewKeydown)
+})
 
 async function saveAll() {
   saving.value = true
