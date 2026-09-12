@@ -67,6 +67,10 @@ Default admin credentials (change immediately!):
 - **Email:** `admin@tabulation.local`
 - **Password:** `Admin1234!`
 
+The seeded admin email is protected from deletion. Set `SEED_ADMIN_EMAIL` to
+override the default `admin@tabulation.local`; the users table and delete API
+both enforce this protection.
+
 ### 4. Start the dev server
 
 ```bash
@@ -85,7 +89,7 @@ tabulation-system/
 │   ├── app.vue                     # Root component
 │   ├── assets/css/main.css         # Tailwind v4 theme + base styles
 │   ├── components/
-│   │   └── EventLeaderboard.vue    # Weighted results table (auto-refresh)
+│   │   └── EventLeaderboard.vue    # Weighted results table (manual refresh)
 │   ├── layouts/
 │   │   ├── admin.vue               # Admin sidebar layout
 │   │   ├── judge.vue               # Judge sidebar layout
@@ -126,6 +130,22 @@ tabulation-system/
 │   └── seed.ts                     # Default admin seeder
 └── prisma.config.ts                # Prisma 7 config file
 ```
+
+## Client State Management Workflow
+
+The application uses Nuxt-native state management rather than a separate Pinia/Vuex store:
+
+1. Keep persistent business data in PostgreSQL and expose it through server API routes.
+2. Load and mutate server data with `useFetch()` and `$fetch()` in the page or component that owns the workflow.
+3. Put only genuinely shared client state in `app/composables/`, backed by Nuxt `useState()`.
+4. Keep forms, loading flags, modal visibility, and other single-view state local to the component.
+5. After a mutation, refresh the relevant `useFetch()` data instead of maintaining a duplicate client cache.
+6. Add Pinia only when multiple routes need coordinated domain actions or a normalized client-side cache.
+
+The shared state currently records the last manual leaderboard update in
+`app/composables/useTabulationState.ts`. Leaderboard results still come from the
+server, and users refresh them with the **Refresh results** button; there is no
+background polling.
 
 ---
 

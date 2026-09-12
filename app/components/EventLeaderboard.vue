@@ -28,16 +28,33 @@
             {{ tab.label }}
           </button>
         </div>
-        <button
-          class="flex items-center gap-1.5 text-sm text-slate hover:text-ink transition-colors pb-2"
-          @click="printTab"
-        >
+        <div class="flex items-center gap-3 pb-2">
+          <span v-if="lastUpdated" class="text-xs text-slate-soft">
+            Updated {{ formatUpdatedAt(lastUpdated) }}
+          </span>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 text-sm text-slate hover:text-ink disabled:opacity-50 transition-colors"
+            :disabled="pending || refreshing"
+            @click="refreshResults"
+          >
+            <svg class="w-4 h-4" :class="refreshing ? 'animate-spin' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 11a8.1 8.1 0 0 0-14.8-4.5L3 9m0-5v5h5M4 13a8.1 8.1 0 0 0 14.8 4.5L21 15m0 5v-5h-5"/>
+            </svg>
+            {{ refreshing ? 'Refreshing...' : 'Refresh results' }}
+          </button>
+          <button
+            type="button"
+            class="flex items-center gap-1.5 text-sm text-slate hover:text-ink transition-colors"
+            @click="printTab"
+          >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
             <rect x="6" y="14" width="12" height="8" rx="1"/>
           </svg>
-          Print
-        </button>
+            Print
+          </button>
+        </div>
       </div>
 
       <!-- Per-judge tab -->
@@ -143,11 +160,25 @@
 const props = defineProps<{ eventId: string; eventName?: string }>()
 
 const { data, pending, refresh } = await useFetch(`/api/events/${props.eventId}/results`)
+const { lastLeaderboardUpdate, markLeaderboardUpdated } = useTabulationState()
+const lastUpdated = lastLeaderboardUpdate(props.eventId)
+const refreshing = ref(false)
 
-// Auto-refresh every 10 s while the component is mounted (useful during live scoring)
-// let interval: ReturnType<typeof setInterval>
-// onMounted(() => { interval = setInterval(refresh, 10_000) })
-// onUnmounted(() => clearInterval(interval))
+async function refreshResults() {
+  refreshing.value = true
+  try {
+    await refresh()
+    markLeaderboardUpdated(props.eventId)
+  } finally {
+    refreshing.value = false
+  }
+}
+
+function formatUpdatedAt(value: string) {
+  return new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+if (data.value) markLeaderboardUpdated(props.eventId)
 
 // Build tab list: one per judge + "Total" at the end
 const tabs = computed(() => {
