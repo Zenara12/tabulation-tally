@@ -177,10 +177,13 @@ Prisma 7 removed `url` from `schema.prisma`. Connection config is now split:
 
 | Where | Purpose |
 |---|---|
-| `prisma.config.ts` → `datasource.url` | Used by CLI: `migrate`, `studio` |
+| `prisma.config.ts` → `datasource.url` | Used by CLI: `migrate`, `studio`; prefers `DIRECT_URL` and falls back to `DATABASE_URL` |
 | `server/utils/prisma.ts` → `@prisma/adapter-pg` | Used at runtime by the app |
 
-Both read from the same `DATABASE_URL` env var. You do **not** need to change anything — just make sure `.env` has a valid `DATABASE_URL`.
+For local development, only `DATABASE_URL` is required. In hosted environments,
+set `DATABASE_URL` to the Supabase pooled runtime URL and `DIRECT_URL` to the
+Supabase direct/session URL so Prisma migrations do not use the transaction
+pooler.
 
 ## Database Scripts
 
@@ -194,11 +197,14 @@ npm run db:reset        # Reset DB + re-run all migrations (dev only!)
 
 ## Deployment
 
-**App:** Deploy to [Vercel](https://vercel.com) (supports Nuxt/Nitro natively)
+See [DEPLOYMENT.md](DEPLOYMENT.md) for the complete Vercel + Supabase setup,
+including environment variables, migrations, seeding, and smoke tests.
 
-**Database:** [Neon](https://neon.tech), [Supabase](https://supabase.com), [Railway](https://railway.app), or self-hosted PostgreSQL
+The app can use [Supabase](https://supabase.com), Neon, Railway, or any
+PostgreSQL provider.
 
-Set `DATABASE_URL` and `NUXT_SESSION_PASSWORD` as environment variables in your deployment platform.
+For Vercel + Supabase, set `DATABASE_URL`, `DIRECT_URL`, and
+`NUXT_SESSION_PASSWORD` in the Vercel Production environment.
 
 ---
 
