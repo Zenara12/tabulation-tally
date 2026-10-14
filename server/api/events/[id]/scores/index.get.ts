@@ -8,5 +8,15 @@ export default defineEventHandler(async (event) => {
 
   const judgeId = user.role === 'ADMIN' && query.judgeId ? String(query.judgeId) : user.id
 
+  if (user.role === 'JUDGE') {
+    const assignment = await prisma.eventJudge.findUnique({
+      where: { eventId_judgeId: { eventId, judgeId: user.id } },
+    })
+
+    if (!assignment) {
+      throw createError({ statusCode: 403, statusMessage: 'You are not assigned to this event' })
+    }
+  }
+
   return prisma.score.findMany({ where: { eventId, judgeId } })
 })

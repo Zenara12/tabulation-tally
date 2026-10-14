@@ -6,14 +6,19 @@ JavaScript client are not required by this application.
 
 ## Deployment status
 
-Before deploying, address these application items:
+The repository is prepared for a first Vercel + Supabase deployment:
 
-1. Generate Prisma Client during the Vercel build. The `generated/` directory is
-   ignored by Git, so a clean Vercel checkout must run `prisma generate`.
-2. Restrict the event results endpoint so an unassigned judge cannot read
-   another event's results or other judges' scores.
-3. Preserve existing `photoUrl` values in the contestant migration before
-   dropping that column.
+- Prisma Client is generated automatically by `postinstall`, including on a
+  clean Vercel checkout.
+- The results report is restricted to administrators. Judges can only submit
+  and read their own scores for events to which they are assigned.
+- The contestant migration renames `photoUrl` to `cosplayPictureUrl`, which
+  preserves existing image values.
+
+If the old contestant migration has already been applied to a shared database,
+do not edit migration history. Restore the old image values from a database
+backup first, then create a forward migration. The migration in this branch is
+safe for a first deployment because it has not been applied to production.
 
 ## Recommended connection setup
 
@@ -54,32 +59,12 @@ characters such as `@`, `:`, `/`, `?`, or `#`.
 
 ## Prisma configuration
 
-The current `prisma.config.ts` reads `DATABASE_URL` for Prisma CLI commands.
-For the recommended two-URL setup, change its datasource configuration to:
+`prisma.config.ts` uses `DIRECT_URL` when it is available and falls back to
+`DATABASE_URL` for local development. The runtime Prisma client always reads
+`DATABASE_URL` from `server/utils/prisma.ts`.
 
-```ts
-datasource: {
-  url: env('DIRECT_URL'),
-},
-```
-
-The runtime Prisma client should continue to read `DATABASE_URL` from
-`server/utils/prisma.ts`.
-
-Also update `package.json` so Vercel generates the ignored Prisma client during
-installation:
-
-```json
-"postinstall": "prisma generate && nuxt prepare"
-```
-
-Alternatively, configure the Vercel build command as:
-
-```bash
-npx prisma generate && npm run build
-```
-
-Use one approach, not both.
+The `postinstall` script runs `prisma generate && nuxt prepare`, so no custom
+Vercel build command or `vercel.json` file is required.
 
 ## Local development setup
 
@@ -153,21 +138,43 @@ Do not run the seed automatically on every Vercel request or server startup.
 
 ## Vercel deployment sequence
 
-1. Create the Supabase project.
-2. Copy the Supabase pooled runtime URL into `DATABASE_URL`.
-3. Copy the Supabase direct/session URL into `DIRECT_URL`.
-4. Set `NUXT_SESSION_PASSWORD` and the seed values in Vercel.
-5. Apply migrations using `npx prisma migrate deploy` from CI or a trusted
+1. Create the Supabase project and copy both connection strings.
+2. Import this repository into Vercel; keep the framework preset as Nuxt.js.
+3. Add `DATABASE_URL`, `DIRECT_URL`, and `NUXT_SESSION_PASSWORD` to the
+   Vercel Production environment. Add the seed variables only if you will run
+   the seed from a trusted machine.
+4. Apply migrations using `npx prisma migrate deploy` from CI or a trusted
    local machine.
-6. Run `npx tsx prisma/seed.ts` once to create the first admin.
-7. Push the Prisma build-script/configuration fixes.
-8. Import the repository into Vercel and deploy.
-9. Verify login, event creation, judge assignment, scoring, results access, and
+5. Run `npx tsx prisma/seed.ts` once to create the first admin.
+6. Deploy from Vercel.
+7. Verify login, event creation, judge assignment, scoring, results access, and
    logout in the production deployment.
 
 Vercel detects Nuxt automatically; a custom Docker deployment is not required.
 The Docker Compose files in this repository are for self-hosted PostgreSQL and
 are not used by Vercel.
+
+## One-time setup required from you
+
+Yes. The repository cannot create your cloud accounts or secrets for you. Do
+these steps once:
+
+1. In Supabase, create a project, wait for the database to become ready, and
+   copy the **Transaction pooler** connection string for `DATABASE_URL` and the
+   **Direct connection** (or session-mode connection) for `DIRECT_URL`.
+2. Generate a stable random value of at least 32 characters for
+   `NUXT_SESSION_PASSWORD`. Keep it unchanged across deploys.
+3. In Vercel, import the repository and add the environment variables listed
+   above under **Settings → Environment Variables → Production**.
+4. From a trusted machine, temporarily set `DIRECT_URL` as the database URL,
+   run `npx prisma migrate deploy`, then run `npx tsx prisma/seed.ts` with a
+   strong `SEED_ADMIN_PASSWORD`.
+5. Deploy and change the seeded admin password immediately after the first
+   login.
+
+Supabase Auth, a Supabase anon key, and a Supabase project URL are not required
+for this application. Authentication is handled by `nuxt-auth-utils` using the
+server-side session secret.
 
 ## Smoke-test checklist
 
