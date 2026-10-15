@@ -1,0 +1,32 @@
+# Dependencies — reinstalled inside the builder stage
+node_modules/
+
+# Nuxt build artifacts — rebuilt inside the builder stage
+.nuxt/
+.output/
+
+# Prisma generated client — regenerated during docker build
+generated/
+
+# Environment files — injected at runtime via docker-compose
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Dev/local files
+.git/
+.gitignore
+*.log
+npm-debug.log*
+
+# Docs
+README.md
+
+# Docker files themselves (no need to copy into image)
+Dockerfile
+docker-compose*.yml
+
+# Editor
+.vscode/
+.idea/

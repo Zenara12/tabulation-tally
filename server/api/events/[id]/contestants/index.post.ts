@@ -1,9 +1,11 @@
 import { z } from 'zod'
 
 const bodySchema = z.object({
-  number: z.number().int().positive(),
   name: z.string().min(1),
-  photoUrl: z.string().url().optional().or(z.literal('')),
+  alias: z.string().optional(),
+  characterName: z.string().optional(),
+  // Accepts a base64 data-URL (image/*;base64,...) or an https URL or empty
+  cosplayPictureUrl: z.string().optional(),
 })
 
 export default defineEventHandler(async (event) => {
@@ -11,14 +13,22 @@ export default defineEventHandler(async (event) => {
   const eventId = getRouterParam(event, 'id')!
   const data = await readValidatedBody(event, bodySchema.parse)
 
-  const existing = await prisma.contestant.findUnique({
-    where: { eventId_number: { eventId, number: data.number } },
+  // Auto-increment: find the current max number for this event and add 1
+  const last = await prisma.contestant.findFirst({
+    where: { eventId },
+    orderBy: { number: 'desc' },
+    select: { number: true },
   })
-  if (existing) {
-    throw createError({ statusCode: 409, statusMessage: `Contestant number ${data.number} is already taken` })
-  }
+  const number = (last?.number ?? 0) + 1
 
   return prisma.contestant.create({
-    data: { ...data, photoUrl: data.photoUrl || null, eventId },
+    data: {
+      eventId,
+      number,
+      name: data.name,
+      alias: data.alias || null,
+      characterName: data.characterName || null,
+      cosplayPictureUrl: data.cosplayPictureUrl || null,
+    },
   })
 })

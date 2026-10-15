@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-paper flex">
-    <aside class="w-64 shrink-0 bg-ink text-paper flex flex-col">
+  <div class="min-h-screen bg-paper flex flex-col md:flex-row">
+    <aside class="w-full md:w-64 shrink-0 bg-ink text-paper flex flex-col">
       <div class="px-6 py-6 border-b border-white/10">
         <p class="font-display text-2xl tracking-tight text-paper">Tabulation</p>
         <p class="text-xs uppercase tracking-[0.2em] text-teal-soft mt-1">Judge Panel</p>

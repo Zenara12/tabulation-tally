@@ -7,12 +7,18 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
+    "postinstall": "prisma generate && nuxt prepare",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "docker:dev": "docker compose -f docker-compose.dev.yml up -d",
+    "docker:dev:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:build": "docker compose --env-file .env.production build",
+    "docker:up": "docker compose --env-file .env.production up -d",
+    "docker:down": "docker compose --env-file .env.production down",
+    "docker:logs": "docker compose --env-file .env.production logs -f"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",

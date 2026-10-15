@@ -1,5 +1,5 @@
 <template>
-  <div class="px-10 py-10 max-w-3xl">
+  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-3xl mx-auto">
     <h1 class="font-display text-3xl text-ink mb-1">Assigned Events</h1>
     <p class="text-sm text-slate mb-8">Events you've been assigned to score.</p>
 
@@ -15,7 +15,7 @@
         v-for="evt in events"
         :key="evt.id"
         :to="`/judge/score/${evt.id}`"
-        class="flex items-center justify-between rounded-lg border border-ink/10 bg-white px-5 py-4 hover:border-teal/60 hover:shadow-sm transition-all"
+        class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-lg border border-ink/10 bg-white px-5 py-4 hover:border-teal/60 hover:shadow-sm transition-all"
       >
         <div>
           <div class="flex items-center gap-2.5">

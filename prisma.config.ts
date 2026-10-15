@@ -1,14 +1,15 @@
 import 'dotenv/config'
-import { defineConfig, env } from 'prisma/config'
+import { defineConfig } from 'prisma/config'
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
 
-  // datasource.url is used by the Prisma CLI for migrate / studio.
-  // The runtime client reads the connection string through @prisma/adapter-pg
-  // in server/utils/prisma.ts — not from here.
+  // Prisma CLI commands must use a direct/session connection. Runtime queries
+  // use DATABASE_URL through @prisma/adapter-pg in server/utils/prisma.ts.
   datasource: {
-    url: env('DATABASE_URL'),
+    // The empty fallback lets `prisma generate` run during dependency
+    // installation without exposing a database secret at image build time.
+    url: process.env.DIRECT_URL ?? process.env.DATABASE_URL ?? '',
   },
 
   migrations: {

@@ -35,7 +35,12 @@
             >{{ u.role }}</span>
           </td>
           <td class="py-3 text-right">
-            <button class="text-sm text-crimson hover:underline" @click="remove(u.id)">Remove</button>
+            <button
+              v-if="!isSeedAdmin(u.email)"
+              class="text-sm text-crimson hover:underline"
+              @click="remove(u.id)"
+            >Remove</button>
+            <span v-else class="text-xs text-slate-soft">Protected</span>
           </td>
         </tr>
       </tbody>
@@ -82,11 +87,17 @@
 definePageMeta({ layout: 'admin' })
 
 const { data: users, pending, refresh } = await useFetch('/api/users')
+const config = useRuntimeConfig()
+const seedAdminEmail = config.public.seedAdminEmail || 'admin@tabulation.local'
 
 const showCreate = ref(false)
 const creating = ref(false)
 const createError = ref('')
 const form = reactive({ name: '', email: '', password: '', role: 'JUDGE' })
+
+function isSeedAdmin(email: string) {
+  return email.toLowerCase() === seedAdminEmail.toLowerCase()
+}
 
 async function createUser() {
   creating.value = true

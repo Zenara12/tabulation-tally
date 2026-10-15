@@ -1,0 +1,67 @@
+# ============================================================
+# Tabulation System — Docker Compose (Production)
+# Usage:
+#   cp .env.example .env.production   # fill in real secrets
+#   docker compose --env-file .env.production up -d --build
+# ============================================================
+
+services:
+
+  # ----------------------------------------------------------
+  # PostgreSQL 17
+  # ----------------------------------------------------------
+  db:
+    image: postgres:17-alpine
+    container_name: tabulation_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-tabulation_db}
+      POSTGRES_USER: ${POSTGRES_USER:-tabulation}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tabulation} -d ${POSTGRES_DB:-tabulation_db}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ----------------------------------------------------------
+  # Nuxt / Nitro app
+  # ----------------------------------------------------------
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tabulation_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER:-tabulation}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-tabulation_db}
+      NUXT_SESSION_PASSWORD: ${NUXT_SESSION_PASSWORD:?NUXT_SESSION_PASSWORD is required (min 32 chars)}
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    networks:
+      - internal
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  internal:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local

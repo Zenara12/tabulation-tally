@@ -7,6 +7,22 @@ export default defineNuxtConfig({
 
   modules: ['nuxt-auth-utils'],
 
+  // Cookie security:
+  //   - Production (NODE_ENV=production): secure:true  — assumes HTTPS via reverse proxy / domain
+  //   - Development / local network HTTP: secure:false — allows session cookies over plain HTTP
+  // Override at runtime by setting NUXT_SESSION_COOKIE_SECURE=false in your .env if needed.
+  runtimeConfig: {
+    seedAdminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@tabulation.local',
+    public: {
+      seedAdminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@tabulation.local',
+    },
+    session: {
+      cookie: {
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
+
   css: ['~/assets/css/main.css'],
 
   vite: {

@@ -67,6 +67,10 @@ Default admin credentials (change immediately!):
 - **Email:** `admin@tabulation.local`
 - **Password:** `Admin1234!`
 
+The seeded admin email is protected from deletion. Set `SEED_ADMIN_EMAIL` to
+override the default `admin@tabulation.local`; the users table and delete API
+both enforce this protection.
+
 ### 4. Start the dev server
 
 ```bash
@@ -85,7 +89,7 @@ tabulation-system/
 │   ├── app.vue                     # Root component
 │   ├── assets/css/main.css         # Tailwind v4 theme + base styles
 │   ├── components/
-│   │   └── EventLeaderboard.vue    # Weighted results table (auto-refresh)
+│   │   └── EventLeaderboard.vue    # Weighted results table (manual refresh)
 │   ├── layouts/
 │   │   ├── admin.vue               # Admin sidebar layout
 │   │   ├── judge.vue               # Judge sidebar layout
@@ -126,6 +130,22 @@ tabulation-system/
 │   └── seed.ts                     # Default admin seeder
 └── prisma.config.ts                # Prisma 7 config file
 ```
+
+## Client State Management Workflow
+
+The application uses Nuxt-native state management rather than a separate Pinia/Vuex store:
+
+1. Keep persistent business data in PostgreSQL and expose it through server API routes.
+2. Load and mutate server data with `useFetch()` and `$fetch()` in the page or component that owns the workflow.
+3. Put only genuinely shared client state in `app/composables/`, backed by Nuxt `useState()`.
+4. Keep forms, loading flags, modal visibility, and other single-view state local to the component.
+5. After a mutation, refresh the relevant `useFetch()` data instead of maintaining a duplicate client cache.
+6. Add Pinia only when multiple routes need coordinated domain actions or a normalized client-side cache.
+
+The shared state currently records the last manual leaderboard update in
+`app/composables/useTabulationState.ts`. Leaderboard results still come from the
+server, and users refresh them with the **Refresh results** button; there is no
+background polling.
 
 ---
 
@@ -179,3 +199,87 @@ npm run db:reset        # Reset DB + re-run all migrations (dev only!)
 **Database:** [Neon](https://neon.tech), [Supabase](https://supabase.com), [Railway](https://railway.app), or self-hosted PostgreSQL
 
 Set `DATABASE_URL` and `NUXT_SESSION_PASSWORD` as environment variables in your deployment platform.
+
+---
+
+## Docker Setup
+
+The project ships with a full Docker setup: a multi-stage Dockerfile for the Nuxt app and a Docker Compose file that wires it to PostgreSQL 17.
+
+### Files added
+
+```
+Dockerfile                    Multi-stage build (builder → slim runner)
+docker-compose.yml            Production: app + postgres
+docker-compose.dev.yml        Dev: postgres only (Nuxt runs on host)
+docker/entrypoint.sh          Waits for DB → runs migrations → starts server
+.env.production.example       Template for production secrets
+.dockerignore                 Keeps image builds fast and clean
+server/api/health.get.ts      GET /api/health — DB ping for healthcheck
+```
+
+### Production deployment
+
+```bash
+# 1. Copy and fill in secrets
+cp .env.production.example .env.production
+# Edit POSTGRES_PASSWORD and NUXT_SESSION_PASSWORD
+
+# 2. Build and start (detached)
+npm run docker:build
+npm run docker:up
+
+# 3. Seed the first admin account (first deploy only)
+docker exec tabulation_app npx tsx prisma/seed.ts
+
+# 4. Check logs
+npm run docker:logs
+```
+
+The app will be available on `http://<your-server-ip>:3000`.
+
+### What happens on startup
+
+The entrypoint script (`docker/entrypoint.sh`) runs automatically inside the container:
+
+1. Waits for PostgreSQL to accept connections (retries up to 30×, 2 s apart)
+2. Runs `prisma migrate deploy` — applies any pending migrations safely
+3. Starts the Nuxt/Nitro server with `node .output/server/index.mjs`
+
+Migrations are safe to run on every deploy — Prisma skips already-applied ones.
+
+### Development: DB in Docker, Nuxt on host
+
+If you just want PostgreSQL containerized and run Nuxt normally:
+
+```bash
+npm run docker:dev          # starts postgres on localhost:5432
+# .env DATABASE_URL should point to localhost:5432
+npm run db:migrate
+npm run db:seed
+npm run dev
+```
+
+### Useful Docker commands
+
+```bash
+npm run docker:logs         # tail all logs
+npm run docker:down         # stop and remove containers
+
+docker exec tabulation_app npx prisma migrate deploy   # manual migration
+docker exec -it tabulation_db psql -U tabulation tabulation_db  # psql shell
+```
+
+### Cookie security in production
+
+In production (`NODE_ENV=production`), session cookies are automatically set to `Secure: true`.
+This means your app **must be served over HTTPS** for logins to work.
+
+Recommended: put an Nginx or Caddy reverse proxy in front that handles TLS, then proxy to `localhost:3000`.
+
+Quick Caddy example (auto-HTTPS):
+```
+yourdomain.com {
+  reverse_proxy localhost:3000
+}
+```
