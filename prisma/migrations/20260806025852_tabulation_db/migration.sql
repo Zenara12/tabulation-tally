@@ -1,10 +1,14 @@
 /*
   Warnings:
 
-  - You are about to drop the column `photoUrl` on the `contestants` table. All the data in the column will be lost.
+  - `photoUrl` is being moved to `cosplayPictureUrl` so existing reference images are preserved.
 
 */
--- AlterTable
-ALTER TABLE "contestants" DROP COLUMN "photoUrl",
-ADD COLUMN     "cosplay" TEXT,
-ADD COLUMN     "cosplayPictureUrl" TEXT;
+-- Preserve the existing image URL before removing the legacy column.
+ALTER TABLE "contestants" ADD COLUMN "cosplayPictureUrl" TEXT;
+UPDATE "contestants" SET "cosplayPictureUrl" = "photoUrl" WHERE "photoUrl" IS NOT NULL;
+ALTER TABLE "contestants" DROP COLUMN "photoUrl";
+
+-- Temporary name retained for the following migration, which renames it to
+-- characterName.
+ALTER TABLE "contestants" ADD COLUMN "cosplay" TEXT;

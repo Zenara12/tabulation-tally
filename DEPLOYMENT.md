@@ -6,14 +6,15 @@ JavaScript client are not required by this application.
 
 ## Deployment status
 
-Before deploying, address these application items:
+This branch includes the Vercel container deployment path:
 
-1. Generate Prisma Client during the Vercel build. The `generated/` directory is
-   ignored by Git, so a clean Vercel checkout must run `prisma generate`.
-2. Restrict the event results endpoint so an unassigned judge cannot read
-   another event's results or other judges' scores.
-3. Preserve existing `photoUrl` values in the contestant migration before
-   dropping that column.
+- `Dockerfile.vercel` builds and starts the Nuxt/Nitro server on Vercel.
+- Prisma Client is generated automatically during `npm ci`.
+- Prisma CLI commands use `DIRECT_URL` when it is configured.
+- Results are restricted to administrators, and judge event data requires an
+  event assignment.
+- The contestant migration copies legacy `photoUrl` values to
+  `cosplayPictureUrl` before removing the old column.
 
 ## Recommended connection setup
 
@@ -54,32 +55,15 @@ characters such as `@`, `:`, `/`, `?`, or `#`.
 
 ## Prisma configuration
 
-The current `prisma.config.ts` reads `DATABASE_URL` for Prisma CLI commands.
-For the recommended two-URL setup, change its datasource configuration to:
+`prisma.config.ts` uses `DIRECT_URL` for Prisma CLI commands and falls back to
+`DATABASE_URL` for local development. The runtime Prisma client continues to
+read the pooled `DATABASE_URL` from `server/utils/prisma.ts`.
 
-```ts
-datasource: {
-  url: env('DIRECT_URL'),
-},
-```
-
-The runtime Prisma client should continue to read `DATABASE_URL` from
-`server/utils/prisma.ts`.
-
-Also update `package.json` so Vercel generates the ignored Prisma client during
-installation:
+`package.json` generates the ignored Prisma client during installation:
 
 ```json
 "postinstall": "prisma generate && nuxt prepare"
 ```
-
-Alternatively, configure the Vercel build command as:
-
-```bash
-npx prisma generate && npm run build
-```
-
-Use one approach, not both.
 
 ## Local development setup
 
@@ -160,14 +144,14 @@ Do not run the seed automatically on every Vercel request or server startup.
 5. Apply migrations using `npx prisma migrate deploy` from CI or a trusted
    local machine.
 6. Run `npx tsx prisma/seed.ts` once to create the first admin.
-7. Push the Prisma build-script/configuration fixes.
-8. Import the repository into Vercel and deploy.
-9. Verify login, event creation, judge assignment, scoring, results access, and
+7. Import the repository into Vercel and deploy. Vercel detects the root
+   `Dockerfile.vercel` automatically.
+8. Verify login, event creation, judge assignment, scoring, results access, and
    logout in the production deployment.
 
-Vercel detects Nuxt automatically; a custom Docker deployment is not required.
-The Docker Compose files in this repository are for self-hosted PostgreSQL and
-are not used by Vercel.
+The Docker Compose files remain for self-hosted PostgreSQL and are not used by
+Vercel. Standard Nuxt deployment without Docker is also supported, but this
+branch is configured for the Vercel container workflow.
 
 ## Smoke-test checklist
 
