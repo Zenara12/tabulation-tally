@@ -20,9 +20,6 @@ COPY prisma/ ./prisma/
 # Install ALL dependencies (including devDependencies needed for build)
 RUN npm ci --no-audit --no-fund
 
-# Generate Prisma client
-RUN npx prisma generate
-
 # Copy the rest of the source
 COPY . .
 
@@ -33,7 +30,7 @@ RUN npm run build
 # ---- Stage 2: Runner -----------------------------------------
 FROM node:22-alpine AS runner
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl netcat-openbsd
 
 WORKDIR /app
 

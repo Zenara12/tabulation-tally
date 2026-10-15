@@ -2,7 +2,10 @@
 //  - perJudge: each judge's individual scores + weighted totals (ranked)
 //  - total: weighted average across all judges (ranked)
 export default defineEventHandler(async (event) => {
-  await requireUserSession(event)
+  // Results include every judge's scores and are currently exposed only in
+  // the admin event view. Do not allow judges to enumerate other events or
+  // inspect other judges' scoring data.
+  await requireRole(event, ['ADMIN'])
   const eventId = getRouterParam(event, 'id')!
 
   const [contestants, criterias, eventJudges, scores] = await Promise.all([
