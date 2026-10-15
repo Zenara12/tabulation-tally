@@ -26,7 +26,6 @@ README.md
 # Docker files themselves (no need to copy into image)
 Dockerfile
 docker-compose*.yml
-docker/
 
 # Editor
 .vscode/
