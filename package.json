@@ -18,7 +18,10 @@
     "docker:build": "docker compose --env-file .env.production build",
     "docker:up": "docker compose --env-file .env.production up -d",
     "docker:down": "docker compose --env-file .env.production down",
-    "docker:logs": "docker compose --env-file .env.production logs -f"
+    "docker:logs": "docker compose --env-file .env.production logs -f",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
@@ -35,6 +38,11 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "tsx": "^4.19.4"
+    "@nuxt/test-utils": "^4.3.3",
+    "@vitest/coverage-v8": "^4.1.11",
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^21.0.3",
+    "tsx": "^4.19.4",
+    "vitest": "^4.1.11"
   }
 }
