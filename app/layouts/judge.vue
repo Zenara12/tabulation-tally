@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-paper flex flex-col md:flex-row">
+  <div class="min-h-dvh bg-paper flex flex-col md:flex-row">
     <aside class="hidden md:flex md:w-64 shrink-0 bg-ink text-paper flex-col">
       <div class="px-6 py-6 border-b border-white/10">
         <p class="font-display text-2xl tracking-tight text-paper">Tabulation</p>
@@ -30,7 +30,7 @@
       </div>
     </aside>
 
-    <main class="flex-1 min-w-0 pb-24 md:pb-0">
+    <main class="flex-1 min-w-0 pb-28 md:pb-0">
       <slot />
     </main>
 

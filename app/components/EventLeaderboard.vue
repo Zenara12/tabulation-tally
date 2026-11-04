@@ -28,7 +28,7 @@
             {{ tab.label }}
           </button>
         </div>
-        <div class="flex items-center gap-3 pb-2">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pb-2">
           <span v-if="lastUpdated" class="text-xs text-slate-soft">
             Updated {{ formatUpdatedAt(lastUpdated) }}
           </span>

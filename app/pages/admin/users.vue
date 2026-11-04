@@ -1,12 +1,12 @@
 <template>
-  <div class="px-10 py-10 max-w-4xl">
-    <div class="flex items-start justify-between mb-8">
+  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-4xl mx-auto">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
         <h1 class="font-display text-3xl text-ink">Judges & Admins</h1>
         <p class="text-sm text-slate mt-1">Manage who can sign in to the system.</p>
       </div>
       <button
-        class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
+        class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
         @click="showCreate = true"
       >
         + New account
@@ -15,7 +15,8 @@
 
     <div v-if="pending" class="text-sm text-slate">Loading…</div>
 
-    <table v-else class="w-full text-sm">
+    <div v-else class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
+      <table class="w-full min-w-[620px] text-sm">
       <thead>
         <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
           <th class="py-2.5 font-medium">Name</th>
@@ -44,10 +45,11 @@
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
 
-    <div v-if="showCreate" class="fixed inset-0 bg-ink/40 flex items-center justify-center px-4 z-50" @click.self="showCreate = false">
-      <div class="bg-white rounded-lg w-full max-w-md p-6">
+    <div v-if="showCreate" class="fixed inset-0 bg-ink/40 flex items-center justify-center px-4 py-4 sm:py-6 z-50" @click.self="showCreate = false">
+      <div class="bg-white rounded-lg w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-5 sm:p-6">
         <h2 class="font-display text-xl text-ink mb-4">New account</h2>
         <form class="space-y-4" @submit.prevent="createUser">
           <div>
@@ -71,9 +73,9 @@
             </select>
           </div>
           <p v-if="createError" class="text-sm text-crimson">{{ createError }}</p>
-          <div class="flex justify-end gap-2 pt-1">
-            <button type="button" class="text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
-            <button type="submit" :disabled="creating" class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
+          <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
+            <button type="button" class="w-full sm:w-auto text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
+            <button type="submit" :disabled="creating" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
               {{ creating ? 'Creating…' : 'Create account' }}
             </button>
           </div>

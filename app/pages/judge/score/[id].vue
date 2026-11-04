@@ -32,11 +32,11 @@
             <span>{{ contestants.length }} contestants</span>
             <span>{{ criterias.length }} criteria</span>
           </div>
-          <div class="flex items-center gap-3">
+          <div class="flex flex-wrap items-center gap-3">
             <span v-if="savedAt" class="text-xs text-teal">Saved {{ savedAt }}</span>
             <button
               :disabled="saving"
-              class="rounded-md bg-teal text-paper text-sm font-medium px-4 py-2 hover:bg-teal-soft disabled:opacity-60 transition-colors"
+              class="w-full sm:w-auto rounded-md bg-teal text-paper text-sm font-medium px-4 py-2 hover:bg-teal-soft disabled:opacity-60 transition-colors"
               @click="saveAll"
             >
               {{ saving ? 'Saving...' : 'Save scores' }}
@@ -138,14 +138,14 @@
       <Teleport to="body">
         <div
           v-if="previewImage"
-          class="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 px-4 py-6"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-ink/70 px-3 py-4 sm:px-4 sm:py-6"
           @click.self="closeImage"
         >
-          <div class="relative w-full max-w-4xl rounded-2xl bg-paper shadow-2xl overflow-hidden">
+          <div class="relative w-full max-w-4xl max-h-[calc(100dvh-2rem)] rounded-2xl bg-paper shadow-2xl overflow-hidden">
             <div class="flex items-center justify-between gap-4 border-b border-ink/10 px-4 py-3">
-              <div>
+              <div class="min-w-0">
                 <p class="font-medium text-ink">Reference image</p>
-                <p class="text-xs text-slate">{{ previewLabel }}</p>
+                <p class="truncate text-xs text-slate">{{ previewLabel }}</p>
               </div>
               <button
                 type="button"
@@ -159,7 +159,7 @@
               <img
                 :src="previewImage"
                 :alt="previewLabel"
-                class="max-h-[80vh] w-full object-contain rounded-lg"
+                class="max-h-[calc(100dvh-8rem)] w-full object-contain rounded-lg"
               >
             </div>
           </div>
