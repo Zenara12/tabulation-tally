@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-paper flex flex-col md:flex-row">
-    <aside class="w-full md:w-64 shrink-0 bg-ink text-paper flex flex-col">
+    <aside class="hidden md:flex md:w-64 shrink-0 bg-ink text-paper flex-col">
       <div class="px-6 py-6 border-b border-white/10">
         <p class="font-display text-2xl tracking-tight text-paper">Tabulation</p>
         <p class="text-xs uppercase tracking-[0.2em] text-brass mt-1">Admin Console</p>
@@ -32,9 +32,11 @@
       </div>
     </aside>
 
-    <main class="flex-1 min-w-0">
+    <main class="flex-1 min-w-0 pb-24 md:pb-0">
       <slot />
     </main>
+
+    <BottomNavigation role="ADMIN" />
   </div>
 </template>
 
