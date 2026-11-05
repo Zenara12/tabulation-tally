@@ -82,6 +82,17 @@
         </form>
       </div>
     </div>
+
+    <ConfirmationModal
+      :open="Boolean(pendingRemoval)"
+      title="Remove account?"
+      message="Are you sure you want to remove this account? This cannot be undone."
+      confirm-text="Remove"
+      cancel-text="Cancel"
+      :busy="removing"
+      @confirm="confirmRemove"
+      @cancel="pendingRemoval = null"
+    />
   </div>
 </template>
 
@@ -94,11 +105,17 @@ const seedAdminEmail = config.public.seedAdminEmail || 'admin@tabulation.local'
 
 const showCreate = ref(false)
 const creating = ref(false)
+const removing = ref(false)
+const pendingRemoval = ref<string | null>(null)
 const createError = ref('')
 const form = reactive({ name: '', email: '', password: '', role: 'JUDGE' })
 
 function isSeedAdmin(email: string) {
   return email.toLowerCase() === seedAdminEmail.toLowerCase()
+}
+
+function remove(id: string) {
+  pendingRemoval.value = id
 }
 
 async function createUser() {
@@ -116,9 +133,16 @@ async function createUser() {
   }
 }
 
-async function remove(id: string) {
-  if (!confirm('Remove this account? This cannot be undone.')) return
-  await $fetch(`/api/users/${id}`, { method: 'DELETE' })
-  await refresh()
+async function confirmRemove() {
+  if (!pendingRemoval.value) return
+
+  removing.value = true
+  try {
+    await $fetch(`/api/users/${pendingRemoval.value}`, { method: 'DELETE' })
+    pendingRemoval.value = null
+    await refresh()
+  } finally {
+    removing.value = false
+  }
 }
 </script>
