@@ -78,12 +78,13 @@ This page should follow the same outer spacing as the other admin pages. In part
 - Keep status and `Score`/`View` actions readable without requiring horizontal scrolling.
 - Ensure the final card can scroll above the fixed bottom navigation because the layout reserves `pb-24`.
 
-### Judge scoring (`app/pages/judge/score/[id].vue`)
+### Judge scoring (`app/pages/judge/score/[id].vue`, `app/components/ScoreCard.vue`)
 
-The scoring grid is intentionally wider than a phone. It should not be forced into unreadable columns.
+The scoring grid is represented by one responsive card per contestant so judges can score without horizontal scrolling.
 
-- Keep the scoring table inside `overflow-x-auto` with its current minimum width.
-- Keep the contestant identity column visible as the first column and preserve number, name, alias, character, and reference image information.
+- Keep the contestant image and identity block together at the top of each card.
+- Preserve number, name, alias, character, and reference image information.
+- Render each criteria as a labeled, full-width numeric input; use a two-column criteria grid only when the viewport has room.
 - Make score inputs large enough for touch entry and keep numeric input behavior unchanged.
 - Keep save actions reachable both above and below the grid. They may become full-width on narrow screens.
 - Keep the progress summary and error message above the grid so the judge understands the current state before scrolling.
