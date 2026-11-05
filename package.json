@@ -1,6 +1,7 @@
 {
   "name": "tabulation-system",
   "type": "module",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "build": "nuxt build",
@@ -37,6 +38,5 @@
   },
   "devDependencies": {
     "tsx": "^4.19.4"
-  },
-  "version": "0.0.1"
+  }
 }
