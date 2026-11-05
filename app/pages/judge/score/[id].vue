@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 mx-auto">
     <div v-if="pending" class="text-sm text-slate">Loading event...</div>
 
     <template v-else-if="event">
@@ -25,7 +25,7 @@
         </p>
       </div>
 
-      <!-- Scoring grid -->
+        <!-- Scoring cards -->
       <template v-else>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
           <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate">
@@ -60,68 +60,16 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-          <table class="w-full min-w-[860px] text-sm border-collapse">
-            <thead>
-              <tr>
-                <th class="text-left py-3 pr-4 font-medium text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10 w-56">
-                  Contestant
-                </th>
-                <th
-                  v-for="c in criterias"
-                  :key="c.id"
-                  class="text-right py-3 px-3 font-medium text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10 w-36"
-                >
-                  {{ c.name }}
-                  <span class="block normal-case tracking-normal text-slate-soft/60">{{ c.weight }}%</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="contestant in contestants" :key="contestant.id" class="border-b border-ink/5 group">
-                <td class="py-3 pr-4">
-                  <div class="flex items-start gap-3">
-                    <img
-                      v-if="contestant.cosplayPictureUrl"
-                      :src="contestant.cosplayPictureUrl"
-                      class="w-10 h-10 rounded object-cover border border-ink/10 shrink-0 cursor-zoom-in"
-                      :alt="contestant.characterName || contestant.alias || contestant.name"
-                      role="button"
-                      tabindex="0"
-                      @click="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
-                      @keydown.enter.prevent="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
-                      @keydown.space.prevent="openImage(contestant.cosplayPictureUrl, contestant.characterName || contestant.alias || contestant.name)"
-                    >
-                    <div>
-                      <span class="font-medium text-ink">{{ contestant.name }}</span>
-                      <span class="block text-xs tabular text-slate-soft">No. {{ contestant.number }}</span>
-                      <span v-if="contestant.alias" class="block text-[10px] text-slate-soft/70 truncate max-w-[180px]">
-                        Alias: {{ contestant.alias }}
-                      </span>
-                      <span v-if="contestant.characterName" class="block text-[10px] text-slate-soft/70 truncate max-w-[180px]">
-                        Character: {{ contestant.characterName }}
-                      </span>
-                    </div>
-                  </div>
-                </td>
-                <td v-for="criteria in criterias" :key="criteria.id" class="py-2 px-2">
-                  <input
-                    type="number"
-                    min="0"
-                    max="100"
-                    step="0.5"
-                    :value="getScore(contestant.id, criteria.id)"
-                    class="w-full rounded border text-right tabular text-sm px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-colors"
-                    :class="hasScore(contestant.id, criteria.id)
-                      ? 'border-teal/30 bg-teal/5 text-ink'
-                      : 'border-ink/15 bg-white text-ink'"
-                    placeholder="-"
-                    @change="setScore(contestant.id, criteria.id, Number(($event.target as HTMLInputElement).value))"
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ScoreCard
+            v-for="contestant in contestants"
+            :key="contestant.id"
+            :contestant="contestant"
+            :criterias="criterias"
+            :scores="localScores"
+            @update-score="setScore(contestant.id, $event.criteriaId, $event.value)"
+            @open-image="openImage"
+          />
         </div>
 
         <div class="flex justify-end mt-6">
@@ -202,12 +150,6 @@ const progressPct = computed(() =>
 
 function key(contestantId: string, criteriaId: string) {
   return `${contestantId}:${criteriaId}`
-}
-function getScore(contestantId: string, criteriaId: string) {
-  return localScores[key(contestantId, criteriaId)] ?? ''
-}
-function hasScore(contestantId: string, criteriaId: string) {
-  return key(contestantId, criteriaId) in localScores
 }
 function setScore(contestantId: string, criteriaId: string, value: number) {
   localScores[key(contestantId, criteriaId)] = value
