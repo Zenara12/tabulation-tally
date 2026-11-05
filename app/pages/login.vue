@@ -79,6 +79,13 @@
           >
             {{ loading ? 'Signing in…' : 'Sign in' }}
           </button>
+
+          <NuxtLink
+            to="/results"
+            class="block mt-5 p-3 border border-teal border-r-5 rounded-2xl text-center text-sm font-medium text-teal transition-colors hover:text-ink"
+          >
+            View public final results
+          </NuxtLink>
         </form>
       </div>
     </div>
