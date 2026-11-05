@@ -46,7 +46,7 @@
           <button
             type="button"
             class="flex items-center gap-1.5 text-sm text-slate hover:text-ink transition-colors"
-            @click="printTab"
+            @click="handlePrint"
           >
           <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
@@ -84,7 +84,7 @@
       </template>
 
       <!-- Hidden printable area -->
-      <div id="print-area" class="hidden print:block">
+      <div id="print-area" ref="printArea" class="hidden print:block">
         <div class="mb-6">
           <h1 class="text-2xl font-bold">{{ eventName }}</h1>
           <p class="text-base text-gray-600 mt-1">{{ printTitle }}</p>
@@ -157,6 +157,8 @@
 </template>
 
 <script setup lang="ts">
+import { useVueToPrint } from 'vue-to-print'
+
 const props = defineProps<{ eventId: string; eventName?: string }>()
 
 const { data, pending, refresh } = await useFetch(`/api/events/${props.eventId}/results`)
@@ -208,17 +210,38 @@ const printTitle = computed(() => {
   return jd ? `Scores by Judge: ${jd.judge.name}` : ''
 })
 
-function printTab() {
-  window.print()
-}
-</script>
+const printArea = ref<HTMLElement | null>(null)
+const printDocumentTitle = computed(() => `${props.eventName ?? 'Event Results'} - ${printTitle.value}`)
+const { handlePrint } = useVueToPrint({
+  content: printArea,
+  documentTitle: printDocumentTitle,
+  removeAfterPrint: true,
+  pageStyle: `
+    @page {
+      margin: 12mm;
+    }
 
-<!-- Print styles: hide the interactive UI, show only #print-area -->
-<style>
-@media print {
-  body > * { display: none !important; }
-  #print-area { display: block !important; }
-  #print-area table { width: 100%; border-collapse: collapse; }
-  #print-area th, #print-area td { border: 1px solid #ccc; padding: 6px 10px; }
-}
-</style>
+    @media print {
+      body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+      }
+
+      #print-area {
+        display: block !important;
+      }
+
+      #print-area table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      #print-area th,
+      #print-area td {
+        border: 1px solid #ccc;
+        padding: 6px 10px;
+      }
+    }
+  `,
+})
+</script>

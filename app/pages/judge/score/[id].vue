@@ -207,7 +207,7 @@ async function saveAll() {
   )
 
   if (errors.length) {
-    saveError.value = errors[0]
+    saveError.value = errors[0] || ''
   } else {
     const now = new Date()
     savedAt.value = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
