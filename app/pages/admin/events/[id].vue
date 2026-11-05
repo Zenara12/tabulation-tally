@@ -5,10 +5,10 @@
         <NuxtLink to="/admin" class="text-xs text-slate hover:text-ink">Back to all events</NuxtLink>
         <h1 class="font-display text-3xl text-ink mt-1">{{ event.name }}</h1>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <select
           v-model="statusModel"
-          class="text-sm rounded-md border border-ink/15 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brass/50"
+          class="w-full sm:w-auto text-sm rounded-md border border-ink/15 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brass/50"
           @change="updateStatus"
         >
           <option value="DRAFT">Draft</option>
@@ -70,7 +70,7 @@
           <label class="block text-xs font-medium text-slate mb-1">Weight %</label>
           <input v-model.number="criteriaForm.weight" type="number" min="0" max="100" required class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
         </div>
-        <button type="submit" class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft">Add</button>
+        <button type="submit" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft">Add</button>
       </form>
     </div>
 
@@ -177,10 +177,10 @@
 
         <p v-if="contestantError" class="text-sm text-crimson">{{ contestantError }}</p>
 
-        <div class="flex justify-end pt-1">
+        <div class="flex justify-stretch sm:justify-end pt-1">
           <button
             :disabled="!contestantForm.name || addingContestant"
-            class="rounded-md bg-ink text-paper text-sm font-medium px-5 py-2.5 hover:bg-ink-soft disabled:opacity-60 transition-colors"
+            class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-5 py-2.5 hover:bg-ink-soft disabled:opacity-60 transition-colors"
             @click="addContestant"
           >
             {{ addingContestant ? 'Adding...' : `Add as Contestant No. ${nextNumber}` }}
@@ -220,7 +220,7 @@
             <option v-for="j in availableJudges" :key="j.id" :value="j.id">{{ j.name }} ({{ j.email }})</option>
           </select>
         </div>
-        <button type="submit" :disabled="!selectedJudgeId" class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft disabled:opacity-60">Assign</button>
+        <button type="submit" :disabled="!selectedJudgeId" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft disabled:opacity-60">Assign</button>
       </form>
     </div>
 

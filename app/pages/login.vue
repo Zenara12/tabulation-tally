@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen grid lg:grid-cols-2">
+  <div class="min-h-dvh grid lg:grid-cols-2">
     <!-- Signature panel: a live scoreboard tally, ink background -->
     <div class="hidden lg:flex flex-col justify-between bg-ink text-paper px-14 py-12 relative overflow-hidden">
       <div class="relative z-10">
@@ -34,9 +34,9 @@
     </div>
 
     <!-- Login form -->
-    <div class="flex items-center justify-center px-6 py-12">
+    <div class="flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
       <div class="w-full max-w-sm">
-        <div class="lg:hidden mb-8">
+        <div class="lg:hidden mb-6 sm:mb-8">
           <p class="font-display text-2xl tracking-tight text-ink">Tabulation</p>
         </div>
 

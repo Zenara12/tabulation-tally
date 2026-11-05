@@ -6,7 +6,7 @@
         <p class="text-sm text-slate mt-1">Create and manage tabulation events.</p>
       </div>
       <button
-        class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
+        class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
         @click="showCreate = true"
       >
         + New event
@@ -45,8 +45,8 @@
     </div>
 
     <!-- Create modal -->
-    <div v-if="showCreate" class="fixed inset-0 bg-ink/40 flex items-center justify-center px-4 z-50" @click.self="showCreate = false">
-      <div class="bg-white rounded-lg w-full max-w-md p-6">
+    <div v-if="showCreate" class="fixed inset-0 bg-ink/40 flex items-center justify-center px-4 py-4 sm:py-6 z-50" @click.self="showCreate = false">
+      <div class="bg-white rounded-lg w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-y-auto p-5 sm:p-6">
         <h2 class="font-display text-xl text-ink mb-4">New event</h2>
         <form class="space-y-4" @submit.prevent="createEvent">
           <div>
@@ -58,9 +58,9 @@
             <textarea v-model="form.description" rows="3" class="w-full rounded-md border border-ink/15 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50" />
           </div>
           <p v-if="createError" class="text-sm text-crimson">{{ createError }}</p>
-          <div class="flex justify-end gap-2 pt-1">
-            <button type="button" class="text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
-            <button type="submit" :disabled="creating" class="rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
+          <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
+            <button type="button" class="w-full sm:w-auto text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
+            <button type="submit" :disabled="creating" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
               {{ creating ? 'Creating…' : 'Create event' }}
             </button>
           </div>

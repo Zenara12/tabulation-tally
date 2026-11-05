@@ -1,6 +1,6 @@
 <template>
   <nav
-    class="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md px-3 pb-3 md:hidden"
+    class="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-md px-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] md:hidden"
     aria-label="Mobile navigation"
   >
     <div class="relative grid rounded-2xl border border-ink/10 bg-ink px-2 py-2 shadow-[0_-8px_30px_rgba(18,22,31,0.16)]">
@@ -46,7 +46,7 @@
 
       <div
         v-if="settingsOpen"
-        class="absolute bottom-full right-3 mb-3 w-64 overflow-hidden rounded-xl border border-ink/10 bg-white text-ink shadow-xl"
+        class="absolute bottom-full right-3 mb-3 w-64 max-w-[calc(100vw-1.5rem)] max-h-[min(28rem,calc(100svh-7rem))] overflow-y-auto rounded-xl border border-ink/10 bg-white text-ink shadow-xl"
         role="menu"
         aria-label="Account settings"
         @click.stop
