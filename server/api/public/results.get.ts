@@ -6,10 +6,6 @@ export default defineEventHandler(async () => {
     where: { status: 'CLOSED' },
     orderBy: { updatedAt: 'desc' },
     include: {
-      criterias: {
-        select: { id: true, weight: true },
-        orderBy: { order: 'asc' },
-      },
       contestants: {
         select: {
           id: true,
@@ -33,20 +29,13 @@ export default defineEventHandler(async () => {
 
   return events.map((event) => {
     const results = event.contestants.map((contestant) => {
-      const weightedTotal = event.criterias.reduce((total, criteria) => {
-        const scores = event.scores.filter(
-          (score) => score.contestantId === contestant.id && score.criteriaId === criteria.id,
-        )
-        const average = scores.length
-          ? scores.reduce((sum, score) => sum + score.score, 0) / scores.length
-          : 0
-
-        return total + (average * criteria.weight) / 100
-      }, 0)
+      const totalScore = event.scores
+        .filter((score) => score.contestantId === contestant.id)
+        .reduce((sum, score) => sum + score.score, 0)
 
       return {
         contestant,
-        finalScore: Math.round(weightedTotal * 100) / 100,
+        finalScore: Math.round(totalScore * 100) / 100,
       }
     })
 

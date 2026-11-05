@@ -19,23 +19,23 @@
       <table class="w-full min-w-[620px] text-sm">
       <thead>
         <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-          <th class="py-2.5 font-medium">Name</th>
-          <th class="py-2.5 font-medium">Email</th>
-          <th class="py-2.5 font-medium">Role</th>
-          <th class="py-2.5 font-medium text-right">Actions</th>
+          <th class="p-2.5 font-medium">Name</th>
+          <th class="p-2.5 font-medium">Email</th>
+          <th class="p-2.5 font-medium">Role</th>
+          <th class="p-2.5 font-medium text-right">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="u in users" :key="u.id" class="border-b border-ink/5">
-          <td class="py-3 text-ink">{{ u.name }}</td>
-          <td class="py-3 text-slate">{{ u.email }}</td>
-          <td class="py-3">
+          <td class="p-3 text-ink">{{ u.name }}</td>
+          <td class="p-3 text-slate">{{ u.email }}</td>
+          <td class="p-3">
             <span
               class="text-[10px] uppercase tracking-wider font-medium rounded-full px-2 py-0.5"
               :class="u.role === 'ADMIN' ? 'bg-brass/15 text-[#8a6d16]' : 'bg-teal/10 text-teal'"
             >{{ u.role }}</span>
           </td>
-          <td class="py-3 text-right">
+          <td class="p-3 text-right">
             <button
               v-if="!isSeedAdmin(u.email)"
               class="text-sm text-crimson hover:underline"
