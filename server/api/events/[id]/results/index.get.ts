@@ -1,6 +1,6 @@
 // Results endpoint returning:
-//  - perJudge: each judge's individual scores + weighted totals (ranked)
-//  - total: weighted average across all judges (ranked)
+//  - perJudge: each judge's individual scores + total scores (ranked)
+//  - total: sum of all judges' scores (ranked)
 export default defineEventHandler(async (event) => {
   // Results include every judge's scores and are currently exposed only in
   // the admin event view. Do not allow judges to enumerate other events or
@@ -18,7 +18,6 @@ export default defineEventHandler(async (event) => {
     prisma.score.findMany({ where: { eventId } }),
   ])
 
-  const totalWeight = criterias.reduce((sum, c) => sum + c.weight, 0)
   const judges = eventJudges.map((ej) => ej.judge)
 
   // ── Helper: build a ranked result row for one contestant given a score subset ──
@@ -32,14 +31,12 @@ export default defineEventHandler(async (event) => {
       return {
         criteriaId: criteria.id,
         criteriaName: criteria.name,
-        weight: criteria.weight,
         score: scoreValue,
-        weighted: scoreValue !== null ? (scoreValue * criteria.weight) / 100 : 0,
       }
     })
 
     const weightedTotal = Math.round(
-      criteriaBreakdown.reduce((sum, c) => sum + c.weighted, 0) * 100,
+      criteriaBreakdown.reduce((sum, c) => sum + (c.score ?? 0), 0) * 100,
     ) / 100
 
     return { contestant, criteriaBreakdown, weightedTotal }
@@ -62,28 +59,26 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  // ── Total view: average each criteria across all judges, then weighted ──
+  // ── Total view: sum each criteria score across all judges ──
   const totalRows = contestants.map((contestant) => {
     const criteriaBreakdown = criterias.map((criteria) => {
       const relevant = scores.filter(
         (s) => s.contestantId === contestant.id && s.criteriaId === criteria.id,
       )
-      const average = relevant.length
-        ? relevant.reduce((sum, s) => sum + s.score, 0) / relevant.length
+      const score = relevant.length
+        ? relevant.reduce((sum, s) => sum + s.score, 0)
         : null
 
       return {
         criteriaId: criteria.id,
         criteriaName: criteria.name,
-        weight: criteria.weight,
-        average,
+        score,
         judgeCount: relevant.length,
-        weighted: average !== null ? (average * criteria.weight) / 100 : 0,
       }
     })
 
     const weightedTotal = Math.round(
-      criteriaBreakdown.reduce((sum, c) => sum + c.weighted, 0) * 100,
+      criteriaBreakdown.reduce((sum, c) => sum + (c.score ?? 0), 0) * 100,
     ) / 100
     const scoresSubmitted = scores.filter((s) => s.contestantId === contestant.id).length
     const scoresExpected = criterias.length * judges.length
@@ -99,7 +94,6 @@ export default defineEventHandler(async (event) => {
   totalRows.sort((a, b) => b.weightedTotal - a.weightedTotal)
 
   return {
-    totalWeight,
     judgeCount: judges.length,
     criteriaCount: criterias.length,
     perJudge,

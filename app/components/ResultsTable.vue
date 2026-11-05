@@ -12,9 +12,8 @@
             class="py-3 font-medium text-right w-20"
           >
             {{ c.criteriaName }}
-            <span class="block text-[10px] normal-case tracking-normal text-slate-soft/70">{{ c.weight }}%</span>
           </th>
-          <th class="py-3 font-medium text-right w-25">Weighted Total</th>
+          <th class="py-3 font-medium text-right w-25">Total Score</th>
         </tr>
       </thead>
       <tbody>
@@ -55,21 +54,8 @@
             :key="c.criteriaId"
             class="py-3 text-right tabular"
           >
-            <template v-if="mode === 'judge'">
-              <span v-if="c.score !== null">
-                <span class="text-ink">{{ c.score.toFixed(2) }}</span>
-                <span class="block text-[10px] text-slate-soft">+{{ c.weighted.toFixed(2) }} pts</span>
-              </span>
-              <span v-else class="text-slate-soft text-xs">—</span>
-            </template>
-
-            <template v-else>
-              <span v-if="c.average !== null">
-                <span class="text-ink">{{ c.average.toFixed(2) }}</span>
-                <span class="block text-[10px] text-slate-soft">+{{ c.weighted.toFixed(2) }} pts</span>
-              </span>
-              <span v-else class="text-slate-soft text-xs">—</span>
-            </template>
+            <span v-if="c.score !== null" class="text-ink">{{ c.score.toFixed(2) }}</span>
+            <span v-else class="text-slate-soft text-xs">—</span>
           </td>
 
           <td class="py-3 text-right tabular">
@@ -87,6 +73,5 @@
 defineProps<{
   rows: any[]
   criterias: any[]
-  mode: 'judge' | 'total'
 }>()
 </script>

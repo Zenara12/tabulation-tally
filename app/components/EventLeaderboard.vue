@@ -8,9 +8,6 @@
       <div class="flex flex-wrap items-center gap-x-6 gap-y-2 mb-5 text-sm text-slate">
         <span>{{ data.judgeCount }} judge{{ data.judgeCount !== 1 ? 's' : '' }}</span>
         <span>{{ data.criteriaCount }} criteria</span>
-        <span class="font-medium" :class="data.totalWeight === 100 ? 'text-teal' : 'text-crimson'">
-          Total weight: {{ data.totalWeight }}%
-        </span>
       </div>
 
       <!-- Tab bar -->
@@ -67,7 +64,7 @@
             >
               Warning: {{ jd.judge.name }} has not scored all contestants yet. Rankings may be incomplete.
             </div>
-            <ResultsTable :rows="jd.results" :criterias="judgeColumns" mode="judge" />
+            <ResultsTable :rows="jd.results" :criterias="judgeColumns" />
           </div>
         </div>
       </template>
@@ -80,7 +77,7 @@
         >
           Warning: Some contestants are missing scores from one or more judges. Rankings may be incomplete.
         </div>
-        <ResultsTable :rows="data.total.results" :criterias="totalColumns" mode="total" />
+        <ResultsTable :rows="data.total.results" :criterias="totalColumns" />
       </template>
 
       <!-- Hidden printable area -->
@@ -102,9 +99,9 @@
                   <th class="border border-gray-300 px-3 py-2 text-left">Alias</th>
                   <th class="border border-gray-300 px-3 py-2 text-left">Character</th>
                   <th v-for="c in jd.results[0]?.criteriaBreakdown" :key="c.criteriaId" class="border border-gray-300 px-3 py-2 text-right">
-                    {{ c.criteriaName }}<br><span class="text-xs text-gray-400">{{ c.weight }}%</span>
+                    {{ c.criteriaName }}
                   </th>
-                  <th class="border border-gray-300 px-3 py-2 text-right">Weighted Total</th>
+                  <th class="border border-gray-300 px-3 py-2 text-right">Total Score</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,9 +129,9 @@
               <th class="border border-gray-300 px-3 py-2 text-left">Alias</th>
               <th class="border border-gray-300 px-3 py-2 text-left">Character</th>
               <th v-for="c in data.total.results[0]?.criteriaBreakdown" :key="c.criteriaId" class="border border-gray-300 px-3 py-2 text-right">
-                {{ c.criteriaName }}<br><span class="text-xs text-gray-400">{{ c.weight }}%</span>
+                {{ c.criteriaName }}
               </th>
-              <th class="border border-gray-300 px-3 py-2 text-right">Weighted Total</th>
+              <th class="border border-gray-300 px-3 py-2 text-right">Total Score</th>
             </tr>
           </thead>
           <tbody>
@@ -144,8 +141,7 @@
               <td class="border border-gray-300 px-3 py-2 text-gray-600">{{ row.contestant.alias || '—' }}</td>
               <td class="border border-gray-300 px-3 py-2 text-gray-600">{{ row.contestant.characterName || '—' }}</td>
               <td v-for="c in row.criteriaBreakdown" :key="c.criteriaId" class="border border-gray-300 px-3 py-2 text-right">
-                {{ c.average !== null ? c.average.toFixed(2) : '—' }}
-                <span class="block text-xs text-gray-400">+{{ c.weighted.toFixed(2) }}</span>
+                {{ c.score !== null ? c.score.toFixed(2) : '—' }}
               </td>
               <td class="border border-gray-300 px-3 py-2 text-right font-bold">{{ row.weightedTotal.toFixed(2) }}</td>
             </tr>
