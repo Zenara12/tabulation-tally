@@ -103,7 +103,7 @@
                 >
                 <span v-else class="text-slate-soft text-xs">—</span>
               </td>
-              <td class="py-2.5 text-right">
+              <td class="p-2.5 text-right">
                 <button class="text-crimson hover:underline text-xs" @click="deleteContestant(c.id)">Remove</button>
               </td>
             </tr>
@@ -228,6 +228,17 @@
     <div v-else-if="activeTab === 'Results'">
       <EventLeaderboard :event-id="eventId" :event-name="event.name" />
     </div>
+
+    <ConfirmationModal
+      :open="Boolean(pendingConfirmation)"
+      :title="pendingConfirmation?.title"
+      :message="pendingConfirmation?.message || ''"
+      :confirm-text="pendingConfirmation?.confirmText"
+      cancel-text="Cancel"
+      :busy="confirming"
+      @confirm="confirmPendingAction"
+      @cancel="pendingConfirmation = null"
+    />
   </div>
 </template>
 
@@ -259,15 +270,70 @@ const availableJudges = computed(() => {
   return (allUsers.value ?? []).filter((u: any) => u.role === 'JUDGE' && !assignedIds.has(u.id))
 })
 
+type ConfirmationAction = 'event' | 'criteria' | 'contestant' | 'judge'
+type PendingConfirmation = {
+  action: ConfirmationAction
+  id?: string
+  title: string
+  message: string
+  confirmText: string
+}
+
+const pendingConfirmation = ref<PendingConfirmation | null>(null)
+const confirming = ref(false)
+
+function requestConfirmation(action: ConfirmationAction, id?: string) {
+  if (action === 'event') {
+    pendingConfirmation.value = {
+      action,
+      title: 'Delete event?',
+      message: `Are you sure you want to delete "${event.value?.name}"? This removes all its data.`,
+      confirmText: 'Delete event',
+    }
+    return
+  }
+
+  if (action === 'criteria') {
+    const criteria = criterias.value.find((item) => item.id === id)
+    pendingConfirmation.value = {
+      action,
+      id,
+      title: 'Remove criteria?',
+      message: `Are you sure you want to remove "${criteria?.name || 'this criteria'}"?`,
+      confirmText: 'Remove',
+    }
+    return
+  }
+
+  if (action === 'contestant') {
+    const contestant = contestants.value.find((item) => item.id === id)
+    pendingConfirmation.value = {
+      action,
+      id,
+      title: 'Delete contestant?',
+      message: `Are you sure you want to delete contestant "${contestant?.name || 'this contestant'}"?`,
+      confirmText: 'Delete contestant',
+    }
+    return
+  }
+
+  const judge = event.value?.judges.find((item) => item.judgeId === id)
+  pendingConfirmation.value = {
+    action,
+    id,
+    title: 'Remove judge?',
+    message: `Are you sure you want to remove ${judge?.judge.name || 'this judge'} from the event?`,
+    confirmText: 'Remove judge',
+  }
+}
+
 async function updateStatus() {
   await $fetch(`/api/events/${eventId}`, { method: 'PATCH', body: { status: statusModel.value } })
   await refreshEvent()
 }
 
 async function removeEvent() {
-  if (!confirm(`Delete "${event.value?.name}"? This removes all its data.`)) return
-  await $fetch(`/api/events/${eventId}`, { method: 'DELETE' })
-  await navigateTo('/admin')
+  requestConfirmation('event')
 }
 
 // Criteria
@@ -282,8 +348,7 @@ async function addCriteria() {
   await refreshEvent()
 }
 async function deleteCriteria(id: string) {
-  await $fetch(`/api/events/${eventId}/criterias/${id}`, { method: 'DELETE' })
-  await refreshEvent()
+  requestConfirmation('criteria', id)
 }
 
 // Contestants
@@ -336,8 +401,7 @@ async function addContestant() {
 }
 
 async function deleteContestant(id: string) {
-  await $fetch(`/api/events/${eventId}/contestants/${id}`, { method: 'DELETE' })
-  await refreshEvent()
+  requestConfirmation('contestant', id)
 }
 
 // Judges
@@ -348,7 +412,31 @@ async function assignJudge() {
   await refreshEvent()
 }
 async function unassignJudge(judgeId: string) {
-  await $fetch(`/api/events/${eventId}/judges/${judgeId}`, { method: 'DELETE' })
-  await refreshEvent()
+  requestConfirmation('judge', judgeId)
+}
+
+async function confirmPendingAction() {
+  const confirmation = pendingConfirmation.value
+  if (!confirmation) return
+
+  confirming.value = true
+  try {
+    if (confirmation.action === 'event') {
+      await $fetch(`/api/events/${eventId}`, { method: 'DELETE' })
+      await navigateTo('/admin')
+    } else if (confirmation.action === 'criteria') {
+      await $fetch(`/api/events/${eventId}/criterias/${confirmation.id}`, { method: 'DELETE' })
+      await refreshEvent()
+    } else if (confirmation.action === 'contestant') {
+      await $fetch(`/api/events/${eventId}/contestants/${confirmation.id}`, { method: 'DELETE' })
+      await refreshEvent()
+    } else if (confirmation.action === 'judge') {
+      await $fetch(`/api/events/${eventId}/judges/${confirmation.id}`, { method: 'DELETE' })
+      await refreshEvent()
+    }
+    pendingConfirmation.value = null
+  } finally {
+    confirming.value = false
+  }
 }
 </script>
