@@ -49,13 +49,13 @@
             class="mb-1.5 flex items-baseline justify-between gap-3"
           >
             <span class="text-base font-semibold text-ink sm:text-lg">{{ criteria.name }}</span>
-            <span class="shrink-0 text-xs font-medium text-slate-soft">{{ criteria.weight }}%</span>
+            <span class="shrink-0 text-xs font-medium text-slate-soft">Cap {{ criteria.weight }}</span>
           </label>
           <input
             :id="`score-${contestant.id}-${criteria.id}`"
             type="number"
             min="0"
-            max="100"
+            :max="criteria.weight"
             step="0.5"
             :value="scoreValue(criteria.id)"
             class="min-h-12 w-full rounded-lg border bg-white px-3 py-2.5 text-right text-base tabular text-ink shadow-sm focus:outline-none focus:ring-2 focus:ring-teal/40 focus:border-teal transition-colors"
