@@ -84,7 +84,9 @@
   }
 
   .select-menu::picker(select) {
-    min-width: 100%;
+    inline-size: max-content;
+    min-inline-size: anchor-size(self-inline);
+    max-inline-size: calc(100vw - 1rem);
     overflow: hidden;
     border: 1px solid rgb(18 22 31 / 15%);
     border-radius: 0.5rem;
@@ -123,6 +125,8 @@
     min-height: 2.5rem;
     border-radius: 0.375rem;
     padding: 0.625rem 0.75rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
     cursor: pointer;
     transition: background-color 120ms ease, color 120ms ease;
   }
