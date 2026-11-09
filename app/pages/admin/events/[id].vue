@@ -42,26 +42,21 @@
         <span class="tabular font-medium" :class="totalWeight === 100 ? 'text-teal' : 'text-crimson'">{{ totalWeight }}%</span>
       </p>
 
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[520px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium">Criteria</th>
-              <th class="p-2.5 font-medium w-32">Weight (%)</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in criterias" :key="c.id" class="border-b border-ink/5">
-              <td class="p-2.5 text-ink">{{ c.name }}</td>
-              <td class="p-2.5 tabular">{{ c.weight }}</td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="deleteCriteria(c.id)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="criteriaTableColumns"
+        :rows="criterias"
+        empty-text="No criteria added yet."
+      >
+        <template #cell-name="{ value }">
+          <span class="text-ink">{{ value }}</span>
+        </template>
+        <template #cell-weight="{ value }">
+          <span class="tabular">{{ value }}</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <button class="text-crimson hover:underline text-xs" @click="deleteCriteria(row.id)">Remove</button>
+        </template>
+      </AdminDataTable>
 
       <form class="flex flex-col sm:flex-row gap-2 sm:items-end pt-2" @submit.prevent="addCriteria">
         <div class="flex-1">
@@ -78,40 +73,36 @@
 
     <!-- Contestants -->
     <div v-else-if="activeTab === 'Contestants'" class="space-y-5">
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[760px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium w-12">No.</th>
-              <th class="p-2.5 font-medium">Name</th>
-              <th class="p-2.5 font-medium">Alias</th>
-              <th class="p-2.5 font-medium">Character</th>
-              <th class="p-2.5 font-medium w-20">Reference</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in contestants" :key="c.id" class="border-b border-ink/5">
-              <td class="p-2.5 tabular text-slate-soft font-medium">{{ c.number }}</td>
-              <td class="p-2.5 text-ink font-medium">{{ c.name }}</td>
-              <td class="p-2.5 text-slate text-sm">{{ c.alias || '—' }}</td>
-              <td class="p-2.5 text-slate text-sm">{{ c.characterName || '—' }}</td>
-              <td class="p-2.5">
-                <img
-                  v-if="c.cosplayPictureUrl"
-                  :src="c.cosplayPictureUrl"
-                  class="w-10 h-10 rounded object-cover border border-ink/10"
-                  alt="reference"
-                >
-                <span v-else class="text-slate-soft text-xs">—</span>
-              </td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="deleteContestant(c.id)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="contestantTableColumns"
+        :rows="contestants"
+        empty-text="No contestants added yet."
+      >
+        <template #cell-number="{ value }">
+          <span class="tabular font-medium text-slate-soft">{{ value }}</span>
+        </template>
+        <template #cell-name="{ value }">
+          <span class="font-medium text-ink">{{ value }}</span>
+        </template>
+        <template #cell-alias="{ value }">
+          <span class="text-sm text-slate">{{ value || '—' }}</span>
+        </template>
+        <template #cell-characterName="{ value }">
+          <span class="text-sm text-slate">{{ value || '—' }}</span>
+        </template>
+        <template #cell-cosplayPictureUrl="{ row }">
+          <img
+            v-if="row.cosplayPictureUrl"
+            :src="row.cosplayPictureUrl"
+            class="h-10 w-10 rounded border border-ink/10 object-cover"
+            alt="reference"
+          >
+          <span v-else class="text-xs text-slate-soft">—</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <button class="text-crimson hover:underline text-xs" @click="deleteContestant(row.id)">Remove</button>
+        </template>
+      </AdminDataTable>
 
       <!-- Add contestant form -->
       <div class="border border-ink/10 rounded-lg p-5 bg-white space-y-4">
@@ -194,26 +185,21 @@
 
     <!-- Judges -->
     <div v-else-if="activeTab === 'Judges'" class="space-y-4">
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[520px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium">Name</th>
-              <th class="p-2.5 font-medium">Email</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="j in event.judges" :key="j.id" class="border-b border-ink/5">
-              <td class="p-2.5 text-ink">{{ j.judge.name }}</td>
-              <td class="p-2.5 text-slate">{{ j.judge.email }}</td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="unassignJudge(j.judgeId)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="judgeTableColumns"
+        :rows="judgeTableRows"
+        empty-text="No judges assigned yet."
+      >
+        <template #cell-name="{ value }">
+          <span class="text-ink">{{ value }}</span>
+        </template>
+        <template #cell-email="{ value }">
+          <span class="text-slate">{{ value }}</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <button class="text-crimson hover:underline text-xs" @click="unassignJudge(row.judgeId)">Remove</button>
+        </template>
+      </AdminDataTable>
 
       <form class="flex flex-col sm:flex-row gap-2 sm:items-end pt-2" @submit.prevent="assignJudge">
         <div class="flex-1">
@@ -266,6 +252,29 @@ watch(event, (v) => { if (v) statusModel.value = v.status })
 const criterias = computed(() => event.value?.criterias ?? [])
 const contestants = computed(() => event.value?.contestants ?? [])
 const totalWeight = computed(() => criterias.value.reduce((s, c) => s + c.weight, 0))
+const criteriaTableColumns = [
+  { key: 'name', label: 'Criteria' },
+  { key: 'weight', label: 'Weight (%)', headerClass: 'w-32' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const contestantTableColumns = [
+  { key: 'number', label: 'No.', headerClass: 'w-12' },
+  { key: 'name', label: 'Name' },
+  { key: 'alias', label: 'Alias' },
+  { key: 'characterName', label: 'Character' },
+  { key: 'cosplayPictureUrl', label: 'Reference', headerClass: 'w-20' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const judgeTableColumns = [
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const judgeTableRows = computed(() => (event.value?.judges ?? []).map((assignment) => ({
+  ...assignment,
+  name: assignment.judge.name,
+  email: assignment.judge.email,
+})))
 const nextNumber = computed(() => {
   if (!contestants.value.length) return 1
   return Math.max(...contestants.value.map((c) => c.number)) + 1
