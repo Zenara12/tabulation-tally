@@ -22,6 +22,7 @@
     "docker:logs": "docker compose --env-file .env.production logs -f"
   },
   "dependencies": {
+    "@nuxt/icon": "^2.6.2",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@supabase/supabase-js": "^2.119.0",
@@ -39,6 +40,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@iconify-json/lucide": "^1.2.152",
     "tsx": "^4.19.4"
   }
 }

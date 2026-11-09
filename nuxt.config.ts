@@ -5,7 +5,13 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['nuxt-auth-utils'],
+  modules: ['nuxt-auth-utils', '@nuxt/icon'],
+
+  icon: {
+    serverBundle: {
+      collections: ['lucide'],
+    },
+  },
 
   // Cookie security:
   //   - Production (NODE_ENV=production): secure:true  — assumes HTTPS via reverse proxy / domain
