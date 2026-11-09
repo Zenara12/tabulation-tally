@@ -1,6 +1,6 @@
 <template>
   <div class="overflow-x-auto">
-    <table class="w-full min-w-[720px] text-sm">
+    <table class="w-full min-w-[640px] text-sm">
       <thead>
         <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
           <th class="py-3 font-medium w-12">Rank</th>

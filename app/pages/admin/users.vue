@@ -6,10 +6,11 @@
         <p class="text-sm text-slate mt-1">Manage who can sign in to the system.</p>
       </div>
       <button
-        class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
+        class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft sm:w-auto"
         @click="showCreate = true"
       >
-        + New account
+        <Icon name="lucide:user-plus" class="h-4 w-4" aria-hidden="true" />
+        New account
       </button>
     </div>
 
@@ -38,9 +39,14 @@
           <td class="p-3 text-right">
             <button
               v-if="!isSeedAdmin(u.email)"
-              class="text-sm text-crimson hover:underline"
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+              title="Remove account"
+              aria-label="Remove account"
               @click="remove(u.id)"
-            >Remove</button>
+            >
+              <Icon name="lucide:user-minus" class="h-4 w-4" aria-hidden="true" />
+            </button>
             <span v-else class="text-xs text-slate-soft">Protected</span>
           </td>
         </tr>

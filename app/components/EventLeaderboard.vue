@@ -40,25 +40,22 @@
           </span>
           <button
             type="button"
-            class="flex items-center gap-1.5 text-sm text-slate hover:text-ink disabled:opacity-50 transition-colors"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink disabled:opacity-50"
             :disabled="pending || refreshing"
+            title="Refresh results"
+            aria-label="Refresh results"
             @click="refreshResults"
           >
-            <svg class="w-4 h-4" :class="refreshing ? 'animate-spin' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <path d="M20 11a8.1 8.1 0 0 0-14.8-4.5L3 9m0-5v5h5M4 13a8.1 8.1 0 0 0 14.8 4.5L21 15m0 5v-5h-5"/>
-            </svg>
-            {{ refreshing ? 'Refreshing...' : 'Refresh results' }}
+            <Icon name="lucide:refresh-cw" class="h-4 w-4" :class="refreshing ? 'animate-spin' : ''" aria-hidden="true" />
           </button>
           <button
             type="button"
-            class="flex items-center gap-1.5 text-sm text-slate hover:text-ink transition-colors"
+            class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+            title="Print results"
+            aria-label="Print results"
             @click="handlePrint"
           >
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-            <rect x="6" y="14" width="12" height="8" rx="1"/>
-          </svg>
-            Print
+            <Icon name="lucide:printer" class="h-4 w-4" aria-hidden="true" />
           </button>
         </div>
       </div>

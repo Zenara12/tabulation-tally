@@ -15,7 +15,15 @@
           <option value="OPEN">Open for scoring</option>
           <option value="CLOSED">Closed</option>
         </select>
-        <button class="text-sm text-crimson hover:underline px-2" @click="removeEvent">Delete</button>
+        <button
+          type="button"
+          class="inline-flex h-9 w-9 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10 disabled:opacity-50"
+          title="Delete event"
+          aria-label="Delete event"
+          @click="removeEvent"
+        >
+          <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
+        </button>
       </div>
     </div>
     <p v-if="event.description" class="text-sm text-slate mb-8">{{ event.description }}</p>
@@ -42,26 +50,29 @@
         <span class="tabular font-medium" :class="totalWeight === 100 ? 'text-teal' : 'text-crimson'">{{ totalWeight }}%</span>
       </p>
 
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[520px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium">Criteria</th>
-              <th class="p-2.5 font-medium w-32">Weight (%)</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in criterias" :key="c.id" class="border-b border-ink/5">
-              <td class="p-2.5 text-ink">{{ c.name }}</td>
-              <td class="p-2.5 tabular">{{ c.weight }}</td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="deleteCriteria(c.id)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="criteriaTableColumns"
+        :rows="criterias"
+        empty-text="No criteria added yet."
+      >
+        <template #cell-name="{ value }">
+          <span class="text-ink">{{ value }}</span>
+        </template>
+        <template #cell-weight="{ value }">
+          <span class="tabular">{{ value }}</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <button
+            type="button"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+            title="Remove criteria"
+            aria-label="Remove criteria"
+            @click="deleteCriteria(row.id)"
+          >
+            <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
+          </button>
+        </template>
+      </AdminDataTable>
 
       <form class="flex flex-col sm:flex-row gap-2 sm:items-end pt-2" @submit.prevent="addCriteria">
         <div class="flex-1">
@@ -72,46 +83,64 @@
           <label class="block text-xs font-medium text-slate mb-1">Weight %</label>
           <input v-model.number="criteriaForm.weight" type="number" min="0" max="100" required class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
         </div>
-        <button type="submit" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft">Add</button>
+          <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft sm:w-auto">
+            <Icon name="lucide:plus" class="h-4 w-4" aria-hidden="true" />
+            Add
+          </button>
       </form>
     </div>
 
     <!-- Contestants -->
     <div v-else-if="activeTab === 'Contestants'" class="space-y-5">
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[760px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium w-12">No.</th>
-              <th class="p-2.5 font-medium">Name</th>
-              <th class="p-2.5 font-medium">Alias</th>
-              <th class="p-2.5 font-medium">Character</th>
-              <th class="p-2.5 font-medium w-20">Reference</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="c in contestants" :key="c.id" class="border-b border-ink/5">
-              <td class="p-2.5 tabular text-slate-soft font-medium">{{ c.number }}</td>
-              <td class="p-2.5 text-ink font-medium">{{ c.name }}</td>
-              <td class="p-2.5 text-slate text-sm">{{ c.alias || '—' }}</td>
-              <td class="p-2.5 text-slate text-sm">{{ c.characterName || '—' }}</td>
-              <td class="p-2.5">
-                <img
-                  v-if="c.cosplayPictureUrl"
-                  :src="c.cosplayPictureUrl"
-                  class="w-10 h-10 rounded object-cover border border-ink/10"
-                  alt="reference"
-                >
-                <span v-else class="text-slate-soft text-xs">—</span>
-              </td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="deleteContestant(c.id)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="contestantTableColumns"
+        :rows="contestants"
+        empty-text="No contestants added yet."
+      >
+        <template #cell-number="{ value }">
+          <span class="tabular font-medium text-slate-soft">{{ value }}</span>
+        </template>
+        <template #cell-name="{ value }">
+          <span class="font-medium text-ink">{{ value }}</span>
+        </template>
+        <template #cell-alias="{ value }">
+          <span class="text-sm text-slate">{{ value || '—' }}</span>
+        </template>
+        <template #cell-characterName="{ value }">
+          <span class="text-sm text-slate">{{ value || '—' }}</span>
+        </template>
+        <template #cell-cosplayPictureUrl="{ row }">
+          <img
+            v-if="row.cosplayPictureUrl"
+            :src="row.cosplayPictureUrl"
+            class="h-10 w-10 rounded border border-ink/10 object-cover"
+            alt="reference"
+          >
+          <span v-else class="text-xs text-slate-soft">—</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <div class="flex items-center justify-end gap-3">
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+              title="Edit contestant"
+              aria-label="Edit contestant"
+              @click="openEditContestant(row)"
+            >
+              <Icon name="lucide:pencil" class="h-4 w-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+              title="Remove contestant"
+              aria-label="Remove contestant"
+              @click="deleteContestant(row.id)"
+            >
+              <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        </template>
+      </AdminDataTable>
 
       <!-- Add contestant form -->
       <div class="border border-ink/10 rounded-lg p-5 bg-white space-y-4">
@@ -171,6 +200,7 @@
                 <p>This image is used as a reference for judges.</p>
                 <p v-if="imageProcessing" class="text-teal">Converting and compressing image...</p>
                 <button v-if="imagePreview" type="button" class="text-crimson hover:underline mt-1" @click="clearImage">
+                  <Icon name="lucide:image-off" class="mr-1 inline-block h-3.5 w-3.5 align-[-2px]" aria-hidden="true" />
                   Remove image
                 </button>
               </div>
@@ -186,6 +216,7 @@
             class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-5 py-2.5 hover:bg-ink-soft disabled:opacity-60 transition-colors"
             @click="addContestant"
           >
+            <Icon :name="imageProcessing || addingContestant ? 'lucide:loader-circle' : 'lucide:user-plus'" class="h-4 w-4" :class="imageProcessing || addingContestant ? 'animate-spin' : ''" aria-hidden="true" />
             {{ imageProcessing ? 'Processing image...' : addingContestant ? 'Adding...' : `Add as Contestant No. ${nextNumber}` }}
           </button>
         </div>
@@ -194,26 +225,29 @@
 
     <!-- Judges -->
     <div v-else-if="activeTab === 'Judges'" class="space-y-4">
-      <div class="overflow-x-auto rounded-lg border border-ink/10 bg-white">
-        <table class="w-full min-w-[520px] text-sm">
-          <thead>
-            <tr class="text-left text-xs uppercase tracking-wider text-slate-soft border-b border-ink/10">
-              <th class="p-2.5 font-medium">Name</th>
-              <th class="p-2.5 font-medium">Email</th>
-              <th class="p-2.5 font-medium w-16 text-right"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="j in event.judges" :key="j.id" class="border-b border-ink/5">
-              <td class="p-2.5 text-ink">{{ j.judge.name }}</td>
-              <td class="p-2.5 text-slate">{{ j.judge.email }}</td>
-              <td class="p-2.5 text-right">
-                <button class="text-crimson hover:underline text-xs" @click="unassignJudge(j.judgeId)">Remove</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <AdminDataTable
+        :columns="judgeTableColumns"
+        :rows="judgeTableRows"
+        empty-text="No judges assigned yet."
+      >
+        <template #cell-name="{ value }">
+          <span class="text-ink">{{ value }}</span>
+        </template>
+        <template #cell-email="{ value }">
+          <span class="text-slate">{{ value }}</span>
+        </template>
+        <template #cell-actions="{ row }">
+          <button
+            type="button"
+            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+            title="Remove judge"
+            aria-label="Remove judge"
+            @click="unassignJudge(row.judgeId)"
+          >
+            <Icon name="lucide:user-minus" class="h-4 w-4" aria-hidden="true" />
+          </button>
+        </template>
+      </AdminDataTable>
 
       <form class="flex flex-col sm:flex-row gap-2 sm:items-end pt-2" @submit.prevent="assignJudge">
         <div class="flex-1">
@@ -223,7 +257,10 @@
             <option v-for="j in availableJudges" :key="j.id" :value="j.id">{{ j.name }} ({{ j.email }})</option>
           </select>
         </div>
-        <button type="submit" :disabled="!selectedJudgeId" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2 hover:bg-ink-soft disabled:opacity-60">Assign</button>
+        <button type="submit" :disabled="!selectedJudgeId" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft disabled:opacity-60 sm:w-auto">
+          <Icon name="lucide:user-plus" class="h-4 w-4" aria-hidden="true" />
+          Assign
+        </button>
       </form>
     </div>
 
@@ -241,6 +278,15 @@
       :busy="confirming"
       @confirm="confirmPendingAction"
       @cancel="pendingConfirmation = null"
+    />
+
+    <ContestantEditModal
+      :open="Boolean(editingContestant)"
+      :contestant="editingContestant"
+      :busy="updatingContestant"
+      :error="contestantUpdateError"
+      @save="saveContestant"
+      @cancel="closeEditContestant"
     />
   </div>
 </template>
@@ -266,6 +312,29 @@ watch(event, (v) => { if (v) statusModel.value = v.status })
 const criterias = computed(() => event.value?.criterias ?? [])
 const contestants = computed(() => event.value?.contestants ?? [])
 const totalWeight = computed(() => criterias.value.reduce((s, c) => s + c.weight, 0))
+const criteriaTableColumns = [
+  { key: 'name', label: 'Criteria' },
+  { key: 'weight', label: 'Weight (%)', headerClass: 'w-32' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const contestantTableColumns = [
+  { key: 'number', label: 'No.', headerClass: 'w-12' },
+  { key: 'name', label: 'Name' },
+  { key: 'alias', label: 'Alias' },
+  { key: 'characterName', label: 'Character' },
+  { key: 'cosplayPictureUrl', label: 'Reference', headerClass: 'w-20' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const judgeTableColumns = [
+  { key: 'name', label: 'Name' },
+  { key: 'email', label: 'Email' },
+  { key: 'actions', label: '', headerClass: 'w-16 text-right', cellClass: 'text-right' },
+]
+const judgeTableRows = computed(() => (event.value?.judges ?? []).map((assignment) => ({
+  ...assignment,
+  name: assignment.judge.name,
+  email: assignment.judge.email,
+})))
 const nextNumber = computed(() => {
   if (!contestants.value.length) return 1
   return Math.max(...contestants.value.map((c) => c.number)) + 1
@@ -287,6 +356,67 @@ type PendingConfirmation = {
 
 const pendingConfirmation = ref<PendingConfirmation | null>(null)
 const confirming = ref(false)
+
+type EditableContestant = {
+  id: string
+  name: string
+  alias?: string | null
+  characterName?: string | null
+  cosplayPictureUrl?: string | null
+}
+
+type ContestantEditPayload = {
+  name: string
+  alias: string
+  characterName: string
+  image: File | null
+  removeImage: boolean
+}
+
+const editingContestant = ref<EditableContestant | null>(null)
+const updatingContestant = ref(false)
+const contestantUpdateError = ref('')
+
+function openEditContestant(contestant: EditableContestant) {
+  contestantUpdateError.value = ''
+  editingContestant.value = contestant
+}
+
+function closeEditContestant() {
+  if (updatingContestant.value) return
+  editingContestant.value = null
+  contestantUpdateError.value = ''
+}
+
+async function saveContestant(payload: ContestantEditPayload) {
+  const contestant = editingContestant.value
+  if (!contestant) return
+
+  updatingContestant.value = true
+  contestantUpdateError.value = ''
+
+  try {
+    const body = new FormData()
+    body.append('name', payload.name)
+    body.append('alias', payload.alias)
+    body.append('characterName', payload.characterName)
+    if (payload.image) body.append('image', payload.image)
+    if (payload.removeImage) body.append('removeImage', 'true')
+
+    await $fetch(`/api/events/${eventId}/contestants/${contestant.id}`, {
+      method: 'PATCH',
+      body,
+    })
+
+    await refreshEvent()
+    editingContestant.value = null
+    contestantUpdateError.value = ''
+  } catch (error: any) {
+    contestantUpdateError.value = error?.data?.statusMessage || 'Failed to update contestant'
+  } finally {
+    updatingContestant.value = false
+  }
+}
 
 function requestConfirmation(action: ConfirmationAction, id?: string) {
   if (action === 'event') {
