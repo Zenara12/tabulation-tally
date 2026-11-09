@@ -8,7 +8,7 @@
       <div class="flex flex-wrap items-center gap-2">
         <select
           v-model="statusModel"
-          class="w-full sm:w-auto text-sm rounded-md border border-ink/15 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brass/50"
+          class="select-menu w-full sm:w-auto text-sm rounded-md border px-3 py-2"
           @change="updateStatus"
         >
           <option value="DRAFT">Draft</option>
@@ -21,16 +21,18 @@
     <p v-if="event.description" class="text-sm text-slate mb-8">{{ event.description }}</p>
     <div v-else class="mb-8" />
 
-    <div class="flex gap-1 border-b border-ink/10 mb-6 overflow-x-auto">
-      <button
-        v-for="tab in tabs"
-        :key="tab"
-        class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap"
-        :class="activeTab === tab ? 'border-brass text-ink' : 'border-transparent text-slate hover:text-ink'"
-        @click="activeTab = tab"
-      >
-        {{ tab }}
-      </button>
+    <div class="w-full pb-2 sm:w-auto">
+      <label for="event-tabs" class="sr-only">Select Option</label>
+      <select id="event-tabs" 
+        v-model="activeTab"
+        class="select-menu w-full rounded-md border px-3 py-2.5 text-sm font-medium sm:min-w-64">
+        <option 
+          v-for="(tab, index) in tabs" 
+          :key="index" 
+          :value="tab">
+          {{ tab }}
+        </option>
+      </select>
     </div>
 
     <!-- Criteria -->
@@ -215,7 +217,7 @@
       <form class="flex flex-col sm:flex-row gap-2 sm:items-end pt-2" @submit.prevent="assignJudge">
         <div class="flex-1">
           <label class="block text-xs font-medium text-slate mb-1">Assign judge</label>
-          <select v-model="selectedJudgeId" class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
+          <select v-model="selectedJudgeId" class="select-menu w-full rounded-md border px-3 py-2 text-sm">
             <option value="" disabled>Select a judge...</option>
             <option v-for="j in availableJudges" :key="j.id" :value="j.id">{{ j.name }} ({{ j.email }})</option>
           </select>

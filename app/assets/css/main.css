@@ -36,6 +36,116 @@
   }
 }
 
+@layer components {
+  /* Shared select styling. Native option menus are still rendered by the
+     browser/OS, but these rules provide consistent colors and states where
+     the browser allows them. */
+  .select-menu {
+    color: var(--color-ink);
+    background-color: #fff;
+    border-color: rgb(18 22 31 / 15%);
+    color-scheme: light;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+  }
+
+  .select-menu:hover {
+    border-color: rgb(201 162 39 / 50%);
+  }
+
+  .select-menu:focus,
+  .select-menu:focus-visible {
+    border-color: var(--color-brass);
+    outline: none;
+    box-shadow: 0 0 0 3px rgb(201 162 39 / 20%);
+  }
+
+  .select-menu option {
+    color: var(--color-ink);
+    background-color: #fff;
+    font-weight: 500;
+  }
+
+  .select-menu option:checked {
+    color: var(--color-ink);
+    background-color: var(--color-brass-soft);
+  }
+
+  .select-menu option:disabled {
+    color: var(--color-slate-soft);
+  }
+}
+
+/* Progressive enhancement based on the web.dev customizable select demo.
+   Unsupported browsers keep the normal native select implementation above. */
+@supports (appearance: base-select) {
+  .select-menu,
+  .select-menu::picker(select) {
+    appearance: base-select;
+  }
+
+  .select-menu::picker(select) {
+    min-width: 100%;
+    overflow: hidden;
+    border: 1px solid rgb(18 22 31 / 15%);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    background: #fff;
+    box-shadow: 0 12px 30px rgb(18 22 31 / 14%);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      display 180ms allow-discrete,
+      overlay 180ms allow-discrete;
+  }
+
+  .select-menu:not(:open)::picker(select) {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  .select-menu:open::picker(select) {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .select-menu::picker-icon {
+    color: var(--color-slate-soft);
+    transition: rotate 180ms ease;
+  }
+
+  .select-menu:open::picker-icon {
+    rotate: 180deg;
+  }
+
+  .select-menu option {
+    display: flex;
+    align-items: center;
+    min-height: 2.5rem;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+  }
+
+  .select-menu option:hover,
+  .select-menu option:focus {
+    color: var(--color-ink);
+    background-color: rgb(201 162 39 / 15%);
+  }
+
+  .select-menu option:checked {
+    color: var(--color-ink);
+    background-color: var(--color-brass-soft);
+    font-weight: 700;
+  }
+
+  .select-menu option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--color-ink);
+  }
+}
+
 @layer utilities {
   .tabular {
     font-family: var(--font-mono);

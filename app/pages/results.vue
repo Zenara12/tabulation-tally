@@ -39,9 +39,10 @@
               </div>
               <p v-if="event.description" class="mt-1 text-sm text-slate">{{ event.description }}</p>
             </div>
-            <time class="text-xs text-slate-soft" :datetime="event.completedAt">
-              Finalized {{ formatDate(event.completedAt) }}
-            </time>
+            <div class="text-right text-xs text-slate-soft">
+              <p>Average of {{ event.judgeCount }} judge{{ event.judgeCount !== 1 ? 's' : '' }}</p>
+              <time :datetime="event.completedAt">Finalized {{ formatDate(event.completedAt) }}</time>
+            </div>
           </div>
 
           <div v-if="!event.results.length" class="rounded-xl border border-dashed border-ink/15 py-12 text-center text-sm text-slate">

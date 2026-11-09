@@ -1,6 +1,6 @@
 // Results endpoint returning:
 //  - perJudge: each judge's individual scores + total scores (ranked)
-//  - total: sum of all judges' scores (ranked)
+//  - total: average scores across all assigned judges (ranked)
 export default defineEventHandler(async (event) => {
   // Results include every judge's scores and are currently exposed only in
   // the admin event view. Do not allow judges to enumerate other events or
@@ -59,14 +59,14 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  // ── Total view: sum each criteria score across all judges ──
+  // ── Total view: average each criteria score across all assigned judges ──
   const totalRows = contestants.map((contestant) => {
     const criteriaBreakdown = criterias.map((criteria) => {
       const relevant = scores.filter(
         (s) => s.contestantId === contestant.id && s.criteriaId === criteria.id,
       )
-      const score = relevant.length
-        ? relevant.reduce((sum, s) => sum + s.score, 0)
+      const score = relevant.length && judges.length
+        ? relevant.reduce((sum, s) => sum + s.score, 0) / judges.length
         : null
 
       return {
