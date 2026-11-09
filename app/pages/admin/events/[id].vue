@@ -100,7 +100,10 @@
           <span v-else class="text-xs text-slate-soft">—</span>
         </template>
         <template #cell-actions="{ row }">
-          <button class="text-crimson hover:underline text-xs" @click="deleteContestant(row.id)">Remove</button>
+          <div class="flex items-center justify-end gap-3">
+            <button class="text-slate hover:text-ink hover:underline text-xs" @click="openEditContestant(row)">Edit</button>
+            <button class="text-crimson hover:underline text-xs" @click="deleteContestant(row.id)">Remove</button>
+          </div>
         </template>
       </AdminDataTable>
 
@@ -228,6 +231,15 @@
       @confirm="confirmPendingAction"
       @cancel="pendingConfirmation = null"
     />
+
+    <ContestantEditModal
+      :open="Boolean(editingContestant)"
+      :contestant="editingContestant"
+      :busy="updatingContestant"
+      :error="contestantUpdateError"
+      @save="saveContestant"
+      @cancel="closeEditContestant"
+    />
   </div>
 </template>
 
@@ -296,6 +308,67 @@ type PendingConfirmation = {
 
 const pendingConfirmation = ref<PendingConfirmation | null>(null)
 const confirming = ref(false)
+
+type EditableContestant = {
+  id: string
+  name: string
+  alias?: string | null
+  characterName?: string | null
+  cosplayPictureUrl?: string | null
+}
+
+type ContestantEditPayload = {
+  name: string
+  alias: string
+  characterName: string
+  image: File | null
+  removeImage: boolean
+}
+
+const editingContestant = ref<EditableContestant | null>(null)
+const updatingContestant = ref(false)
+const contestantUpdateError = ref('')
+
+function openEditContestant(contestant: EditableContestant) {
+  contestantUpdateError.value = ''
+  editingContestant.value = contestant
+}
+
+function closeEditContestant() {
+  if (updatingContestant.value) return
+  editingContestant.value = null
+  contestantUpdateError.value = ''
+}
+
+async function saveContestant(payload: ContestantEditPayload) {
+  const contestant = editingContestant.value
+  if (!contestant) return
+
+  updatingContestant.value = true
+  contestantUpdateError.value = ''
+
+  try {
+    const body = new FormData()
+    body.append('name', payload.name)
+    body.append('alias', payload.alias)
+    body.append('characterName', payload.characterName)
+    if (payload.image) body.append('image', payload.image)
+    if (payload.removeImage) body.append('removeImage', 'true')
+
+    await $fetch(`/api/events/${eventId}/contestants/${contestant.id}`, {
+      method: 'PATCH',
+      body,
+    })
+
+    await refreshEvent()
+    editingContestant.value = null
+    contestantUpdateError.value = ''
+  } catch (error: any) {
+    contestantUpdateError.value = error?.data?.statusMessage || 'Failed to update contestant'
+  } finally {
+    updatingContestant.value = false
+  }
+}
 
 function requestConfirmation(action: ConfirmationAction, id?: string) {
   if (action === 'event') {
