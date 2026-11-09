@@ -67,7 +67,7 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-ink mb-1.5">Role</label>
-            <select v-model="form.role" class="w-full rounded-md border border-ink/15 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
+            <select v-model="form.role" class="select-menu w-full rounded-md border px-3.5 py-2.5 text-sm">
               <option value="JUDGE">Judge</option>
               <option value="ADMIN">Admin</option>
             </select>

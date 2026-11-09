@@ -12,18 +12,27 @@
 
       <!-- Tab bar -->
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-ink/10 mb-6">
-        <div class="flex gap-1 overflow-x-auto pb-px">
-          <button
-            v-for="tab in tabs"
-            :key="tab.key"
-            class="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap"
-            :class="activeTab === tab.key
-              ? 'border-brass text-ink'
-              : 'border-transparent text-slate hover:text-ink'"
-            @click="activeTab = tab.key"
-          >
-            {{ tab.label }}
-          </button>
+        <div class="w-full pb-2 sm:w-72">
+          <label for="result-view" class="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-soft">
+            Result view
+          </label>
+          <div class="relative">
+            <select
+              id="result-view"
+              v-model="activeTab"
+              class="select-menu w-full appearance-none rounded-lg border px-3 py-2.5 text-sm font-medium shadow-sm"
+            >
+              <option
+                v-for="tab in tabs"
+                :key="tab.key"
+                :value="tab.key"
+                class="bg-white text-ink"
+              >
+                {{ tab.label }}
+              </option>
+            </select>
+
+          </div>
         </div>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-2 pb-2">
           <span v-if="lastUpdated" class="text-xs text-slate-soft">
@@ -64,20 +73,23 @@
             >
               Warning: {{ jd.judge.name }} has not scored all contestants yet. Rankings may be incomplete.
             </div>
-            <ResultsTable :rows="jd.results" :criterias="judgeColumns" />
+            <ResultsTable :rows="jd.results" :criterias="judgeColumns" mode="judge" />
           </div>
         </div>
       </template>
 
       <!-- Total tab -->
       <template v-else>
+        <p class="mb-5 text-sm text-slate">
+          Average total scores across {{ data.judgeCount }} judge{{ data.judgeCount !== 1 ? 's' : '' }}.
+        </p>
         <div
           v-if="data.total.results.some((r) => !r.complete)"
           class="rounded-md bg-brass/10 border border-brass/30 px-4 py-3 text-sm text-ink mb-5"
         >
           Warning: Some contestants are missing scores from one or more judges. Rankings may be incomplete.
         </div>
-        <ResultsTable :rows="data.total.results" :criterias="totalColumns" />
+        <ResultsTable :rows="data.total.results" :criterias="totalColumns" mode="total" />
       </template>
 
       <!-- Hidden printable area -->
@@ -131,7 +143,7 @@
               <th v-for="c in data.total.results[0]?.criteriaBreakdown" :key="c.criteriaId" class="border border-gray-300 px-3 py-2 text-right">
                 {{ c.criteriaName }}
               </th>
-              <th class="border border-gray-300 px-3 py-2 text-right">Total Score</th>
+              <th class="border border-gray-300 px-3 py-2 text-right">Final Score</th>
             </tr>
           </thead>
           <tbody>

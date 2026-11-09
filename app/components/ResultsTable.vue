@@ -13,7 +13,9 @@
           >
             {{ c.criteriaName }}
           </th>
-          <th class="py-3 font-medium text-right w-25">Total Score</th>
+          <th class="py-3 font-medium text-right w-25">
+            {{ mode === 'total' ? 'Final Score' : 'Total Score' }}
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -73,5 +75,6 @@
 defineProps<{
   rows: any[]
   criterias: any[]
+  mode: 'judge' | 'total'
 }>()
 </script>

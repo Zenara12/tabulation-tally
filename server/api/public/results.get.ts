@@ -6,6 +6,9 @@ export default defineEventHandler(async () => {
     where: { status: 'CLOSED' },
     orderBy: { updatedAt: 'desc' },
     include: {
+      judges: {
+        select: { id: true },
+      },
       contestants: {
         select: {
           id: true,
@@ -28,14 +31,16 @@ export default defineEventHandler(async () => {
   })
 
   return events.map((event) => {
+    const judgeCount = event.judges.length
     const results = event.contestants.map((contestant) => {
       const totalScore = event.scores
         .filter((score) => score.contestantId === contestant.id)
         .reduce((sum, score) => sum + score.score, 0)
+      const averageScore = judgeCount ? totalScore / judgeCount : 0
 
       return {
         contestant,
-        finalScore: Math.round(totalScore * 100) / 100,
+        finalScore: Math.round(averageScore * 100) / 100,
       }
     })
 
@@ -49,6 +54,7 @@ export default defineEventHandler(async () => {
       name: event.name,
       description: event.description,
       completedAt: event.updatedAt,
+      judgeCount,
       results: results.map((result, index) => ({
         ...result,
         rank: index + 1,
