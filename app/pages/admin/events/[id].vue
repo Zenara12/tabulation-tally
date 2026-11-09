@@ -167,8 +167,9 @@
               </label>
               <div class="flex-1 text-xs text-slate-soft pt-1 space-y-1">
                 <p>Accepted: JPG, PNG, WebP, GIF</p>
-                <p>Recommended: square or portrait, under 2 MB</p>
+                <p>Converted to WebP and compressed under 2 MB before upload</p>
                 <p>This image is used as a reference for judges.</p>
+                <p v-if="imageProcessing" class="text-teal">Converting and compressing image...</p>
                 <button v-if="imagePreview" type="button" class="text-crimson hover:underline mt-1" @click="clearImage">
                   Remove image
                 </button>
@@ -181,11 +182,11 @@
 
         <div class="flex justify-stretch sm:justify-end pt-1">
           <button
-            :disabled="!contestantForm.name || addingContestant"
+            :disabled="!contestantForm.name || addingContestant || imageProcessing"
             class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-5 py-2.5 hover:bg-ink-soft disabled:opacity-60 transition-colors"
             @click="addContestant"
           >
-            {{ addingContestant ? 'Adding...' : `Add as Contestant No. ${nextNumber}` }}
+            {{ imageProcessing ? 'Processing image...' : addingContestant ? 'Adding...' : `Add as Contestant No. ${nextNumber}` }}
           </button>
         </div>
       </div>
@@ -245,6 +246,9 @@
 </template>
 
 <script setup lang="ts">
+import imageCompression from 'browser-image-compression'
+import { onBeforeUnmount } from 'vue'
+
 definePageMeta({ layout: 'admin' })
 
 const route = useRoute()
@@ -358,37 +362,68 @@ const contestantForm = reactive({ name: '', alias: '', characterName: '' })
 const contestantError = ref('')
 const addingContestant = ref(false)
 const imagePreview = ref<string | null>(null)
-const imageDataUrl = ref<string | null>(null)
+const compressedImage = ref<File | null>(null)
+const imageProcessing = ref(false)
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024
 
-function onImagePick(e: Event) {
-  const file = (e.target as HTMLInputElement).files?.[0]
+async function onImagePick(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  input.value = ''
   if (!file) return
-  const reader = new FileReader()
-  reader.onload = (ev) => {
-    const result = ev.target?.result as string
-    imagePreview.value = result
-    imageDataUrl.value = result
+
+  contestantError.value = ''
+  imageProcessing.value = true
+  try {
+    const compressed = await imageCompression(file, {
+      fileType: 'image/webp',
+      initialQuality: 0.82,
+      maxIteration: 10,
+      maxSizeMB: 1.95,
+      maxWidthOrHeight: 2048,
+      useWebWorker: true,
+    })
+
+    if (compressed.size >= MAX_IMAGE_BYTES) {
+      throw new Error('The image could not be compressed under 2 MB')
+    }
+
+    clearImage()
+    compressedImage.value = new File(
+      [compressed],
+      `${file.name.replace(/\.[^/.]+$/, '') || 'contestant'}.webp`,
+      { type: 'image/webp', lastModified: Date.now() },
+    )
+    imagePreview.value = URL.createObjectURL(compressedImage.value)
+  } catch {
+    clearImage()
+    contestantError.value = 'Failed to convert and compress the selected image.'
+  } finally {
+    imageProcessing.value = false
   }
-  reader.readAsDataURL(file)
 }
 
 function clearImage() {
+  if (imagePreview.value?.startsWith('blob:')) URL.revokeObjectURL(imagePreview.value)
   imagePreview.value = null
-  imageDataUrl.value = null
+  compressedImage.value = null
 }
+
+onBeforeUnmount(clearImage)
 
 async function addContestant() {
   contestantError.value = ''
   addingContestant.value = true
   try {
+    const body = new FormData()
+    body.append('name', contestantForm.name)
+    if (contestantForm.alias) body.append('alias', contestantForm.alias)
+    if (contestantForm.characterName) body.append('characterName', contestantForm.characterName)
+    if (compressedImage.value) body.append('image', compressedImage.value)
+
     await $fetch(`/api/events/${eventId}/contestants`, {
       method: 'POST',
-      body: {
-        name: contestantForm.name,
-        alias: contestantForm.alias || undefined,
-        characterName: contestantForm.characterName || undefined,
-        cosplayPictureUrl: imageDataUrl.value || undefined,
-      },
+      body,
     })
     contestantForm.name = ''
     contestantForm.alias = ''

@@ -90,7 +90,7 @@ model Contestant {
   name              String
   alias             String?  // cosplayer alias / performer alias
   characterName     String?  // character or title being portrayed
-  cosplayPictureUrl String?  // base64 data-URL or remote URL of reference image
+  cosplayPictureUrl String?  // public Supabase Storage URL of reference image
   createdAt         DateTime @default(now())
 
   event  Event   @relation(fields: [eventId], references: [id], onDelete: Cascade)
