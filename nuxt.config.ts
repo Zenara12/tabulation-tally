@@ -15,6 +15,8 @@ export default defineNuxtConfig({
     seedAdminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@tabulation.local',
     public: {
       seedAdminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@tabulation.local',
+      supabaseUrl: process.env.SUPABASE_URL,
+      serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
     },
     session: {
       cookie: {

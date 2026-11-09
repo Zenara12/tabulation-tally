@@ -1,8 +1,8 @@
 # Vercel + Supabase Deployment
 
-This project uses Nuxt/Nitro, `nuxt-auth-utils`, Prisma 7, PostgreSQL, and Zod.
-Supabase is used as the PostgreSQL provider; Supabase Auth and the Supabase
-JavaScript client are not required by this application.
+This project uses Nuxt/Nitro, `nuxt-auth-utils`, Prisma 7, Zod, and the
+Supabase JavaScript client for server-side image uploads. Supabase is also used
+as the PostgreSQL provider.
 
 ## Deployment status
 
@@ -37,6 +37,9 @@ DATABASE_URL="postgresql://...pooler...:6543/postgres?..."
 DIRECT_URL="postgresql://...direct-or-session...:5432/postgres?..."
 NUXT_SESSION_PASSWORD="a-random-secret-at-least-32-characters-long"
 SEED_ADMIN_EMAIL="admin@example.com"
+SUPABASE_URL="https://your-project.supabase.co"
+SUPABASE_SERVICE_ROLE_KEY="your-server-only-service-role-key"
+SUPABASE_STORAGE_BUCKET="contestant-images"
 ```
 
 Do not commit real values. `NUXT_SESSION_PASSWORD` must remain stable between
@@ -52,6 +55,19 @@ SEED_ADMIN_NAME="System Admin"
 
 The database password in either URL must be URL-encoded when it contains
 characters such as `@`, `:`, `/`, `?`, or `#`.
+
+## Supabase Storage setup
+
+Create a Storage bucket named `contestant-images`, or use another bucket name
+through `SUPABASE_STORAGE_BUCKET`. The bucket must be public because the stored
+image URLs are rendered on the public final-results page. Keep
+`SUPABASE_SERVICE_ROLE_KEY` server-only; it must not be exposed as a Nuxt public
+runtime variable or committed to the repository.
+
+Contestant images are converted to WebP and compressed in the browser before
+being sent as multipart form data. The server verifies the WebP content type
+and a file size below 2 MB, uploads the file to Supabase Storage, and stores
+only the resulting public URL in `cosplayPictureUrl`.
 
 ## Prisma configuration
 
