@@ -15,15 +15,16 @@
           <option value="OPEN">Open for scoring</option>
           <option value="CLOSED">Closed</option>
         </select>
-        <button
-          type="button"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10 disabled:opacity-50"
+        <AppButton
+          color="crimson"
+          variant="ghost"
+          size="icon"
           title="Delete event"
           aria-label="Delete event"
           @click="removeEvent"
         >
           <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
-        </button>
+        </AppButton>
       </div>
     </div>
     <p v-if="event.description" class="text-sm text-slate mb-8">{{ event.description }}</p>
@@ -63,24 +64,26 @@
         </template>
         <template #cell-actions="{ row }">
           <div class="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+            <AppButton
+              color="slate"
+              variant="ghost"
+              size="icon-sm"
               title="Edit criteria"
               aria-label="Edit criteria"
               @click="openEditCriteria(row)"
             >
               <Icon name="lucide:pencil" class="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+            </AppButton>
+            <AppButton
+              color="crimson"
+              variant="ghost"
+              size="icon-sm"
               title="Remove criteria"
               aria-label="Remove criteria"
               @click="deleteCriteria(row.id)"
             >
               <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
-            </button>
+            </AppButton>
           </div>
         </template>
       </AdminDataTable>
@@ -94,10 +97,10 @@
           <label class="block text-[11px] font-medium text-slate mb-1">Remaining: {{ remainingWeight }}%</label>
           <input v-model.number="criteriaForm.weight" type="number" min="0" :max="remainingWeight" step="0.5" required :disabled="remainingWeight === 0" class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50 disabled:cursor-not-allowed disabled:bg-paper-dim">
         </div>
-        <button type="submit" :disabled="remainingWeight === 0" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+        <AppButton type="submit" :disabled="remainingWeight === 0" disabled-opacity="50" size="sm" class="w-full sm:w-auto">
           <Icon name="lucide:plus" class="h-4 w-4" aria-hidden="true" />
           Add
-        </button>
+        </AppButton>
       </form>
       <p v-if="criteriaError" class="text-sm text-crimson">{{ criteriaError }}</p>
     </div>
@@ -132,24 +135,26 @@
         </template>
         <template #cell-actions="{ row }">
           <div class="flex items-center justify-end gap-3">
-            <button
-              type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+            <AppButton
+              color="slate"
+              variant="ghost"
+              size="icon-sm"
               title="Edit contestant"
               aria-label="Edit contestant"
               @click="openEditContestant(row)"
             >
               <Icon name="lucide:pencil" class="h-4 w-4" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+            </AppButton>
+            <AppButton
+              color="crimson"
+              variant="ghost"
+              size="icon-sm"
               title="Remove contestant"
               aria-label="Remove contestant"
               @click="deleteContestant(row.id)"
             >
               <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
-            </button>
+            </AppButton>
           </div>
         </template>
       </AdminDataTable>
@@ -211,10 +216,10 @@
                 <p>Converted to WebP and compressed under 2 MB before upload</p>
                 <p>This image is used as a reference for judges.</p>
                 <p v-if="imageProcessing" class="text-teal">Converting and compressing image...</p>
-                <button v-if="imagePreview" type="button" class="text-crimson hover:underline mt-1" @click="clearImage">
+                <AppButton v-if="imagePreview" color="crimson" variant="ghost" size="xs" :hover="false" disabled-opacity="50" class="mt-1 px-0 underline-offset-2 hover:underline" @click="clearImage">
                   <Icon name="lucide:image-off" class="mr-1 inline-block h-3.5 w-3.5 align-[-2px]" aria-hidden="true" />
                   Remove image
-                </button>
+                </AppButton>
               </div>
             </div>
           </div>
@@ -223,14 +228,14 @@
         <p v-if="contestantError" class="text-sm text-crimson">{{ contestantError }}</p>
 
         <div class="flex justify-stretch sm:justify-end pt-1">
-          <button
+          <AppButton
+            class="w-full px-5 sm:w-auto"
             :disabled="!contestantForm.name || addingContestant || imageProcessing"
-            class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-5 py-2.5 hover:bg-ink-soft disabled:opacity-60 transition-colors"
             @click="addContestant"
           >
             <Icon :name="imageProcessing || addingContestant ? 'lucide:loader-circle' : 'lucide:user-plus'" class="h-4 w-4" :class="imageProcessing || addingContestant ? 'animate-spin' : ''" aria-hidden="true" />
             {{ imageProcessing ? 'Processing image...' : addingContestant ? 'Adding...' : `Add as Contestant No. ${nextNumber}` }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </div>
@@ -249,15 +254,16 @@
           <span class="text-slate">{{ value }}</span>
         </template>
         <template #cell-actions="{ row }">
-          <button
-            type="button"
-            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+          <AppButton
+            color="crimson"
+            variant="ghost"
+            size="icon-sm"
             title="Remove judge"
             aria-label="Remove judge"
             @click="unassignJudge(row.judgeId)"
           >
             <Icon name="lucide:user-minus" class="h-4 w-4" aria-hidden="true" />
-          </button>
+          </AppButton>
         </template>
       </AdminDataTable>
 
@@ -269,10 +275,10 @@
             <option v-for="j in availableJudges" :key="j.id" :value="j.id">{{ j.name }} ({{ j.email }})</option>
           </select>
         </div>
-        <button type="submit" :disabled="!selectedJudgeId" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft disabled:opacity-60 sm:w-auto">
+        <AppButton type="submit" size="sm" :disabled="!selectedJudgeId" class="w-full sm:w-auto">
           <Icon name="lucide:user-plus" class="h-4 w-4" aria-hidden="true" />
           Assign
-        </button>
+        </AppButton>
       </form>
     </div>
 

@@ -27,22 +27,25 @@
         </div>
 
         <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            class="w-full rounded-lg border border-ink/15 px-4 py-2.5 text-sm font-medium text-slate transition-colors hover:bg-paper hover:text-ink disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          <AppButton
+            color="slate"
+            variant="outline"
+            border="subtle"
+            hover-color="transparent"
+            class="w-full sm:w-auto"
             :disabled="busy"
             @click="cancel"
           >
             {{ cancelText }}
-          </button>
-          <button
-            type="button"
-            class="w-full rounded-lg bg-crimson px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-crimson/90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          </AppButton>
+          <AppButton
+            color="crimson"
+            class="w-full sm:w-auto"
             :disabled="busy"
             @click="confirm"
           >
             {{ busy ? 'Please wait…' : confirmText }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </div>

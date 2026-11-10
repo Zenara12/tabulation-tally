@@ -21,12 +21,15 @@
           <p class="text-sm text-paper truncate">{{ user?.name }}</p>
           <p class="text-xs text-slate-soft truncate">{{ user?.email }}</p>
         </div>
-        <button
-          class="w-full text-left rounded-md px-3 py-2.5 text-sm font-medium text-slate-soft hover:bg-white/5 hover:text-crimson transition-colors"
+        <AppButton
+          color="transparent"
+          variant="ghost"
+          :hover="false"
+          class="w-full justify-start px-3 text-left text-slate-soft hover:bg-white/5 hover:text-crimson"
           @click="logout"
         >
           Sign out
-        </button>
+        </AppButton>
       </div>
     </aside>
 

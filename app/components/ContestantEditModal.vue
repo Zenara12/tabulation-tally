@@ -18,17 +18,18 @@
             <h2 :id="titleId" class="text-lg font-semibold text-ink">Edit contestant</h2>
             <p class="mt-1 text-sm text-slate">Update contestant details and reference image.</p>
           </div>
-          <button
-            type="button"
-            class="rounded-md p-1.5 text-slate-soft transition-colors hover:bg-paper hover:text-ink disabled:opacity-50"
+          <AppButton
+            color="slate"
+            variant="ghost"
+            size="icon-sm"
+            class="text-slate-soft"
+            disabled-opacity="50"
             :disabled="busy"
             aria-label="Close edit contestant dialog"
             @click="cancel"
           >
-            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
-          </button>
+            <Icon name="lucide:x" class="h-5 w-5" aria-hidden="true" />
+          </AppButton>
         </div>
 
         <div class="mt-5 grid gap-4 sm:grid-cols-2">
@@ -80,15 +81,19 @@
                 <p>Accepted: JPG, PNG, WebP, GIF</p>
                 <p>Converted to WebP and compressed under 2 MB</p>
                 <p v-if="imageProcessing" class="text-teal">Processing image...</p>
-                <button
+                <AppButton
                   v-if="imagePreview"
-                  type="button"
-                  class="mt-1 text-crimson hover:underline disabled:opacity-50"
+                  color="crimson"
+                  variant="ghost"
+                  size="xs"
+                  :hover="false"
+                  disabled-opacity="50"
+                  class="mt-1 px-0 underline-offset-2 hover:underline"
                   :disabled="busy || imageProcessing"
                   @click="clearImage"
                 >
                   Remove image
-                </button>
+                </AppButton>
               </div>
             </div>
           </div>
@@ -97,21 +102,24 @@
         <p v-if="error || imageError" class="mt-4 text-sm text-crimson">{{ error || imageError }}</p>
 
         <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            class="w-full rounded-lg border border-ink/15 px-4 py-2.5 text-sm font-medium text-slate transition-colors hover:bg-paper hover:text-ink disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          <AppButton
+            color="slate"
+            variant="outline"
+            border="subtle"
+            hover-color="transparent"
+            class="w-full sm:w-auto"
             :disabled="busy"
             @click="cancel"
           >
             Cancel
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             type="submit"
-            class="w-full rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            class="w-full sm:w-auto"
             :disabled="busy || imageProcessing || !form.name.trim()"
           >
             {{ busy ? 'Saving...' : 'Save changes' }}
-          </button>
+          </AppButton>
         </div>
       </form>
     </div>

@@ -1,10 +1,14 @@
 <template>
   <article class="overflow-hidden rounded-2xl border border-ink/10 bg-white shadow-sm">
     <div class="flex items-start gap-4 p-4 sm:gap-5 sm:p-5">
-      <button
+      <AppButton
         v-if="contestant.cosplayPictureUrl"
-        type="button"
-        class="group relative h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-ink/10 bg-paper sm:h-24 sm:w-24 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
+        color="transparent"
+        variant="ghost"
+        size="icon"
+        border="light"
+        :hover="false"
+        class="group relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-paper p-0 sm:h-24 sm:w-24 lg:h-16 lg:w-16 xl:h-20 xl:w-20"
         :aria-label="`View reference image for ${imageLabel}`"
         @click="emit('open-image', contestant.cosplayPictureUrl, imageLabel)"
       >
@@ -16,7 +20,7 @@
         <span class="absolute inset-x-0 bottom-0 bg-ink/70 px-2 py-1 text-center text-[10px] font-medium text-paper opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
           View image
         </span>
-      </button>
+      </AppButton>
 
       <div v-else class="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg border border-dashed border-ink/15 bg-paper px-2 text-center text-xs text-slate-soft sm:h-24 sm:w-24 lg:h-16 lg:w-16 xl:h-20 xl:w-20">
         No reference image
