@@ -5,12 +5,12 @@
         <h1 class="font-display text-3xl text-ink">Events</h1>
         <p class="text-sm text-slate mt-1">Create and manage tabulation events.</p>
       </div>
-      <button
-        class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft transition-colors"
+      <AppButton
+        class="w-full sm:w-auto"
         @click="showCreate = true"
       >
         + New event
-      </button>
+      </AppButton>
     </div>
 
     <div v-if="pending" class="text-sm text-slate">Loading events…</div>
@@ -59,10 +59,10 @@
           </div>
           <p v-if="createError" class="text-sm text-crimson">{{ createError }}</p>
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
-            <button type="button" class="w-full sm:w-auto text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
-            <button type="submit" :disabled="creating" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
+            <AppButton color="transparent" variant="ghost" :hover="false" class="w-full sm:w-auto hover:text-ink" @click="showCreate = false">Cancel</AppButton>
+            <AppButton type="submit" class="w-full sm:w-auto" :disabled="creating">
               {{ creating ? 'Creating…' : 'Create event' }}
-            </button>
+            </AppButton>
           </div>
         </form>
       </div>

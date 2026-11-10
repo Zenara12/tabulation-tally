@@ -72,13 +72,13 @@
 
           <p v-if="error" class="text-sm text-crimson">{{ error }}</p>
 
-          <button
+          <AppButton
             type="submit"
+            class="w-full"
             :disabled="loading"
-            class="w-full rounded-md bg-ink text-paper text-sm font-medium py-2.5 hover:bg-ink-soft transition-colors disabled:opacity-60"
           >
             {{ loading ? 'Signing in…' : 'Sign in' }}
-          </button>
+          </AppButton>
 
           <NuxtLink
             to="/results"

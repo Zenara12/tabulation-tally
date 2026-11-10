@@ -18,15 +18,18 @@
             <h2 :id="titleId" class="text-lg font-semibold text-ink">Edit criteria</h2>
             <p class="mt-1 text-sm text-slate">Update the criteria name and weight.</p>
           </div>
-          <button
-            type="button"
-            class="rounded-md p-1.5 text-slate-soft transition-colors hover:bg-paper hover:text-ink disabled:opacity-50"
+          <AppButton
+            color="slate"
+            variant="ghost"
+            size="icon-sm"
+            class="text-slate-soft"
+            disabled-opacity="50"
             :disabled="busy"
             aria-label="Close edit criteria dialog"
             @click="cancel"
           >
             <Icon name="lucide:x" class="h-5 w-5" aria-hidden="true" />
-          </button>
+          </AppButton>
         </div>
 
         <div class="mt-5 space-y-4">
@@ -59,22 +62,25 @@
         <p v-if="error" class="mt-4 text-sm text-crimson">{{ error }}</p>
 
         <div class="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            class="w-full rounded-lg border border-ink/15 px-4 py-2.5 text-sm font-medium text-slate transition-colors hover:bg-paper hover:text-ink disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+          <AppButton
+            color="slate"
+            variant="outline"
+            border="subtle"
+            hover-color="transparent"
+            class="w-full sm:w-auto"
             :disabled="busy"
             @click="cancel"
           >
             Cancel
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             type="submit"
-            class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+            class="w-full sm:w-auto"
             :disabled="busy || !form.name.trim() || !Number.isFinite(form.weight) || form.weight < 0 || form.weight > maxWeight"
           >
             <Icon :name="busy ? 'lucide:loader-circle' : 'lucide:save'" class="h-4 w-4" :class="busy ? 'animate-spin' : ''" aria-hidden="true" />
             {{ busy ? 'Saving...' : 'Save changes' }}
-          </button>
+          </AppButton>
         </div>
       </form>
     </div>

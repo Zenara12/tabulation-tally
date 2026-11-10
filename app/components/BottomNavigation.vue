@@ -28,9 +28,11 @@
           <span>{{ link.label }}</span>
         </NuxtLink>
 
-        <button
-          type="button"
-          class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-2 text-[11px] font-medium transition-colors hover:bg-white/5"
+        <AppButton
+          color="transparent"
+          variant="ghost"
+          :hover="false"
+          class="min-h-14 flex-col rounded-xl px-2 text-[11px] hover:bg-white/5"
           :class="settingsOpen ? 'bg-white/10 text-brass' : 'text-slate-soft hover:text-paper'"
           :aria-expanded="settingsOpen"
           aria-haspopup="menu"
@@ -41,7 +43,7 @@
             <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 1.7-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56V20h-2.4v-.2a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.7-1.7.06-.06A1.7 1.7 0 0 0 8.46 15a1.7 1.7 0 0 0-1.56-1.03H6.7v-2.4h.2a1.7 1.7 0 0 0 1.56-1.03 1.7 1.7 0 0 0-.34-1.88l-.06-.06 1.7-1.7.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.2h2.4v.2a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 1.7 1.7-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.2v2.4h-.2A1.7 1.7 0 0 0 19.4 15Z" />
           </svg>
           <span>Settings</span>
-        </button>
+        </AppButton>
       </div>
 
       <div
@@ -57,9 +59,10 @@
           <p class="truncate text-xs text-slate">{{ user?.email }}</p>
         </div>
         <div class="p-1.5">
-          <button
-            type="button"
-            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-slate transition-colors hover:bg-paper hover:text-ink"
+          <AppButton
+            color="transparent"
+            variant="ghost"
+            class="w-full justify-start rounded-lg px-3 py-2.5 text-left text-sm text-slate hover:bg-paper hover:text-ink"
             role="menuitem"
             @click="settingsOpen = false"
           >
@@ -68,10 +71,12 @@
               <path d="M4 21a8 8 0 0 1 16 0" />
             </svg>
             <span>User</span>
-          </button>
-          <button
-            type="button"
-            class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-crimson transition-colors hover:bg-crimson/5"
+          </AppButton>
+          <AppButton
+            color="crimson"
+            variant="ghost"
+            :hover="false"
+            class="w-full justify-start rounded-lg px-3 py-2.5 text-left text-sm hover:bg-crimson/5"
             role="menuitem"
             @click="logout"
           >
@@ -80,7 +85,7 @@
               <path d="m16 17 5-5-5-5M21 12H9" />
             </svg>
             <span>Sign out</span>
-          </button>
+          </AppButton>
         </div>
       </div>
     </div>

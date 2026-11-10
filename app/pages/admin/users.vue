@@ -5,13 +5,13 @@
         <h1 class="font-display text-3xl text-ink">Judges & Admins</h1>
         <p class="text-sm text-slate mt-1">Manage who can sign in to the system.</p>
       </div>
-      <button
-        class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2.5 text-sm font-medium text-paper transition-colors hover:bg-ink-soft sm:w-auto"
+      <AppButton
+        class="w-full sm:w-auto"
         @click="showCreate = true"
       >
         <Icon name="lucide:user-plus" class="h-4 w-4" aria-hidden="true" />
         New account
-      </button>
+      </AppButton>
     </div>
 
     <div v-if="pending" class="text-sm text-slate">Loading…</div>
@@ -37,16 +37,17 @@
             >{{ u.role }}</span>
           </td>
           <td class="p-3 text-right">
-            <button
+            <AppButton
               v-if="!isSeedAdmin(u.email)"
-              type="button"
-              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+              color="crimson"
+              variant="ghost"
+              size="icon"
               title="Remove account"
               aria-label="Remove account"
               @click="remove(u.id)"
             >
               <Icon name="lucide:user-minus" class="h-4 w-4" aria-hidden="true" />
-            </button>
+            </AppButton>
             <span v-else class="text-xs text-slate-soft">Protected</span>
           </td>
         </tr>
@@ -80,10 +81,10 @@
           </div>
           <p v-if="createError" class="text-sm text-crimson">{{ createError }}</p>
           <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-1">
-            <button type="button" class="w-full sm:w-auto text-sm px-4 py-2.5 text-slate hover:text-ink" @click="showCreate = false">Cancel</button>
-            <button type="submit" :disabled="creating" class="w-full sm:w-auto rounded-md bg-ink text-paper text-sm font-medium px-4 py-2.5 hover:bg-ink-soft disabled:opacity-60">
+            <AppButton color="transparent" variant="ghost" :hover="false" class="w-full sm:w-auto hover:text-ink" @click="showCreate = false">Cancel</AppButton>
+            <AppButton type="submit" class="w-full sm:w-auto" :disabled="creating">
               {{ creating ? 'Creating…' : 'Create account' }}
-            </button>
+            </AppButton>
           </div>
         </form>
       </div>

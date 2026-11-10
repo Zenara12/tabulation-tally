@@ -34,13 +34,15 @@
           </div>
           <div class="flex flex-wrap items-center gap-3">
             <span v-if="savedAt" class="text-xs text-teal">Saved {{ savedAt }}</span>
-            <button
+            <AppButton
+              color="teal"
+              size="sm"
+              class="w-full sm:w-auto"
               :disabled="saving"
-              class="w-full sm:w-auto rounded-md bg-teal text-paper text-sm font-medium px-4 py-2 hover:bg-teal-soft disabled:opacity-60 transition-colors"
               @click="saveAll"
             >
               {{ saving ? 'Saving...' : 'Save scores' }}
-            </button>
+            </AppButton>
           </div>
         </div>
 
@@ -73,13 +75,14 @@
         </div>
 
         <div class="flex justify-end mt-6">
-          <button
+          <AppButton
+            color="teal"
+            class="px-6"
             :disabled="saving"
-            class="rounded-md bg-teal text-paper text-sm font-medium px-6 py-2.5 hover:bg-teal-soft disabled:opacity-60 transition-colors"
             @click="saveAll"
           >
             {{ saving ? 'Saving...' : 'Save all scores' }}
-          </button>
+          </AppButton>
         </div>
       </template>
 
@@ -95,13 +98,16 @@
                 <p class="font-medium text-ink">Reference image</p>
                 <p class="truncate text-xs text-slate">{{ previewLabel }}</p>
               </div>
-              <button
-                type="button"
-                class="rounded-md px-3 py-1.5 text-sm font-medium text-slate hover:text-ink hover:bg-ink/5 transition-colors"
+              <AppButton
+                color="transparent"
+                variant="ghost"
+                size="xs"
+                :hover="false"
+                class="px-3 hover:bg-ink/5 hover:text-ink"
                 @click="closeImage"
               >
                 Close
-              </button>
+              </AppButton>
             </div>
             <div class="bg-black flex items-center justify-center p-3 sm:p-6">
               <img

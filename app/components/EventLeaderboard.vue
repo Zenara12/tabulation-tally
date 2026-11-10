@@ -38,25 +38,28 @@
           <span v-if="lastUpdated" class="text-xs text-slate-soft">
             Updated {{ formatUpdatedAt(lastUpdated) }}
           </span>
-          <button
-            type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink disabled:opacity-50"
+          <AppButton
+            color="slate"
+            variant="ghost"
+            size="icon"
+            disabled-opacity="50"
             :disabled="pending || refreshing"
             title="Refresh results"
             aria-label="Refresh results"
             @click="refreshResults"
           >
             <Icon name="lucide:refresh-cw" class="h-4 w-4" :class="refreshing ? 'animate-spin' : ''" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            class="inline-flex h-9 w-9 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+          </AppButton>
+          <AppButton
+            color="slate"
+            variant="ghost"
+            size="icon"
             title="Print results"
             aria-label="Print results"
             @click="handlePrint"
           >
             <Icon name="lucide:printer" class="h-4 w-4" aria-hidden="true" />
-          </button>
+          </AppButton>
         </div>
       </div>
 
