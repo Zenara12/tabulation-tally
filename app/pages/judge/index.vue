@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-3xl mx-auto">
+  <div class="w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-7xl">
     <h1 class="font-display text-3xl text-ink mb-1">Assigned Events</h1>
     <p class="text-sm text-slate mb-8">Events you've been assigned to score.</p>
 
