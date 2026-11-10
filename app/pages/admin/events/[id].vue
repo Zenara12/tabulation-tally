@@ -1,11 +1,11 @@
 <template>
-  <div v-if="event" class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+  <div v-if="event" class="w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-7xl">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-2">
       <div>
         <NuxtLink to="/admin" class="text-xs text-slate hover:text-ink">Back to all events</NuxtLink>
         <h1 class="font-display text-3xl text-ink mt-1">{{ event.name }}</h1>
       </div>
-      <div class="flex flex-wrap items-center gap-2">
+      <div class="flex items-center gap-2">
         <select
           v-model="statusModel"
           class="select-menu w-full sm:w-auto text-sm rounded-md border px-3 py-2"
@@ -62,15 +62,26 @@
           <span class="tabular">{{ value }}</span>
         </template>
         <template #cell-actions="{ row }">
-          <button
-            type="button"
-            class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
-            title="Remove criteria"
-            aria-label="Remove criteria"
-            @click="deleteCriteria(row.id)"
-          >
-            <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
-          </button>
+          <div class="flex items-center justify-end gap-2">
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-slate transition-colors hover:bg-paper hover:text-ink"
+              title="Edit criteria"
+              aria-label="Edit criteria"
+              @click="openEditCriteria(row)"
+            >
+              <Icon name="lucide:pencil" class="h-4 w-4" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="inline-flex h-8 w-8 items-center justify-center rounded-md text-crimson transition-colors hover:bg-crimson/10"
+              title="Remove criteria"
+              aria-label="Remove criteria"
+              @click="deleteCriteria(row.id)"
+            >
+              <Icon name="lucide:trash-2" class="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
         </template>
       </AdminDataTable>
 
@@ -80,14 +91,15 @@
           <input v-model="criteriaForm.name" required class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
         </div>
         <div class="w-full sm:w-28">
-          <label class="block text-xs font-medium text-slate mb-1">Weight %</label>
-          <input v-model.number="criteriaForm.weight" type="number" min="0" max="100" required class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50">
+          <label class="block text-[11px] font-medium text-slate mb-1">Remaining: {{ remainingWeight }}%</label>
+          <input v-model.number="criteriaForm.weight" type="number" min="0" :max="remainingWeight" step="0.5" required :disabled="remainingWeight === 0" class="w-full rounded-md border border-ink/15 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brass/50 disabled:cursor-not-allowed disabled:bg-paper-dim">
         </div>
-          <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft sm:w-auto">
-            <Icon name="lucide:plus" class="h-4 w-4" aria-hidden="true" />
-            Add
-          </button>
+        <button type="submit" :disabled="remainingWeight === 0" class="inline-flex w-full items-center justify-center gap-2 rounded-md bg-ink px-4 py-2 text-sm font-medium text-paper hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto">
+          <Icon name="lucide:plus" class="h-4 w-4" aria-hidden="true" />
+          Add
+        </button>
       </form>
+      <p v-if="criteriaError" class="text-sm text-crimson">{{ criteriaError }}</p>
     </div>
 
     <!-- Contestants -->
@@ -280,6 +292,16 @@
       @cancel="pendingConfirmation = null"
     />
 
+    <CriteriaEditModal
+      :open="Boolean(editingCriteria)"
+      :criteria="editingCriteria"
+      :max-weight="editingCriteriaMaxWeight"
+      :busy="updatingCriteria"
+      :error="criteriaUpdateError"
+      @save="saveCriteria"
+      @cancel="closeEditCriteria"
+    />
+
     <ContestantEditModal
       :open="Boolean(editingContestant)"
       :contestant="editingContestant"
@@ -312,6 +334,7 @@ watch(event, (v) => { if (v) statusModel.value = v.status })
 const criterias = computed(() => event.value?.criterias ?? [])
 const contestants = computed(() => event.value?.contestants ?? [])
 const totalWeight = computed(() => criterias.value.reduce((s, c) => s + c.weight, 0))
+const remainingWeight = computed(() => Math.max(0, 100 - totalWeight.value))
 const criteriaTableColumns = [
   { key: 'name', label: 'Criteria' },
   { key: 'weight', label: 'Weight (%)', headerClass: 'w-32' },
@@ -356,6 +379,20 @@ type PendingConfirmation = {
 
 const pendingConfirmation = ref<PendingConfirmation | null>(null)
 const confirming = ref(false)
+
+type EditableCriteria = {
+  id: string
+  name: string
+  weight: number
+}
+
+const editingCriteria = ref<EditableCriteria | null>(null)
+const updatingCriteria = ref(false)
+const criteriaUpdateError = ref('')
+const editingCriteriaMaxWeight = computed(() => {
+  if (!editingCriteria.value) return 0
+  return Math.max(0, 100 - (totalWeight.value - editingCriteria.value.weight))
+})
 
 type EditableContestant = {
   id: string
@@ -474,14 +511,58 @@ async function removeEvent() {
 
 // Criteria
 const criteriaForm = reactive({ name: '', weight: 0 })
+const criteriaError = ref('')
+
+watch(remainingWeight, (remaining) => {
+  if (criteriaForm.weight > remaining) criteriaForm.weight = remaining
+})
+
+function openEditCriteria(criteria: EditableCriteria) {
+  criteriaUpdateError.value = ''
+  editingCriteria.value = criteria
+}
+
+function closeEditCriteria() {
+  if (updatingCriteria.value) return
+  editingCriteria.value = null
+  criteriaUpdateError.value = ''
+}
+
+async function saveCriteria(payload: { name: string; weight: number }) {
+  const criteria = editingCriteria.value
+  if (!criteria) return
+
+  updatingCriteria.value = true
+  criteriaUpdateError.value = ''
+  try {
+    await $fetch(`/api/events/${eventId}/criterias/${criteria.id}`, {
+      method: 'PATCH',
+      body: payload,
+    })
+    await refreshEvent()
+    editingCriteria.value = null
+  } catch (error: any) {
+    criteriaUpdateError.value = error?.data?.statusMessage || 'Failed to update criteria'
+  } finally {
+    updatingCriteria.value = false
+  }
+}
+
 async function addCriteria() {
-  await $fetch(`/api/events/${eventId}/criterias`, {
-    method: 'POST',
-    body: { name: criteriaForm.name, weight: criteriaForm.weight, order: criterias.value.length },
-  })
-  criteriaForm.name = ''
-  criteriaForm.weight = 0
-  await refreshEvent()
+  criteriaError.value = ''
+  if (!criteriaForm.name.trim() || criteriaForm.weight < 0 || criteriaForm.weight > remainingWeight.value) return
+
+  try {
+    await $fetch(`/api/events/${eventId}/criterias`, {
+      method: 'POST',
+      body: { name: criteriaForm.name.trim(), weight: criteriaForm.weight, order: criterias.value.length },
+    })
+    criteriaForm.name = ''
+    criteriaForm.weight = 0
+    await refreshEvent()
+  } catch (error: any) {
+    criteriaError.value = error?.data?.statusMessage || 'Failed to add criteria'
+  }
 }
 async function deleteCriteria(id: string) {
   requestConfirmation('criteria', id)

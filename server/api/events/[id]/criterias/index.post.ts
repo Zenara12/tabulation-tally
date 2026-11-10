@@ -11,5 +11,18 @@ export default defineEventHandler(async (event) => {
   const eventId = getRouterParam(event, 'id')!
   const data = await readValidatedBody(event, bodySchema.parse)
 
+  const currentTotal = await prisma.criteria.aggregate({
+    where: { eventId },
+    _sum: { weight: true },
+  })
+  const totalWeight = currentTotal._sum.weight ?? 0
+
+  if (totalWeight + data.weight > 100) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Criteria weights cannot exceed 100%. Only ${Math.max(0, 100 - totalWeight)}% remains.`,
+    })
+  }
+
   return prisma.criteria.create({ data: { ...data, eventId } })
 })
