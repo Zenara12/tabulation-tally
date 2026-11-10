@@ -1,5 +1,5 @@
 <template>
-  <div v-if="event" class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+  <div v-if="event" class="w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-7xl">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-2">
       <div>
         <NuxtLink to="/admin" class="text-xs text-slate hover:text-ink">Back to all events</NuxtLink>

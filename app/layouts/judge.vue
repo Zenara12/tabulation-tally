@@ -30,8 +30,9 @@
       </div>
     </aside>
 
-    <main class="flex-1 min-w-0 pb-28 md:pb-0">
+    <main class="flex flex-1 flex-col items-center min-w-0 pb-28 md:pb-0">
       <slot />
+      <TradeMark />
     </main>
 
     <BottomNavigation role="JUDGE" />

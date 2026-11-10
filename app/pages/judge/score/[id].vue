@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 mx-auto">
+  <div class="w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-7xl">
     <div v-if="pending" class="text-sm text-slate">Loading event...</div>
 
     <template v-else-if="event">

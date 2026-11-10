@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-dvh grid lg:grid-cols-2">
+  <div id="login" class="w-full sm:min-h-dvh grid lg:grid-cols-2">
     <!-- Signature panel: a live scoreboard tally, ink background -->
-    <div class="hidden lg:flex flex-col justify-between bg-ink text-paper px-14 py-12 relative overflow-hidden">
+    <div class="hidden lg:flex flex-col flex-nowrap gap-55 justify-between bg-ink text-paper px-14 py-12 relative overflow-hidden">
       <div class="relative z-10">
         <p class="font-display text-3xl tracking-tight">Tabulation</p>
         <p class="text-xs uppercase tracking-[0.25em] text-brass mt-1">Scoring, settled fairly</p>
@@ -30,11 +30,11 @@
         </div>
       </div>
 
-      <p class="relative z-10 text-xs text-slate-soft">Nuxt · Prisma · PostgreSQL</p>
+      <TradeMark />
     </div>
 
     <!-- Login form -->
-    <div class="flex items-center justify-center px-4 py-8 sm:px-6 sm:py-12">
+    <div class="flex items-center justify-center px-4 pt-8 sm:pt-0 sm:px-6">
       <div class="w-full max-w-sm">
         <div class="lg:hidden mb-6 sm:mb-8">
           <p class="font-display text-2xl tracking-tight text-ink">Tabulation</p>

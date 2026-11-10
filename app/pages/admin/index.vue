@@ -1,5 +1,5 @@
 <template>
-  <div class="px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-5xl mx-auto">
+  <div class="w-full px-4 py-6 sm:px-6 lg:px-10 lg:py-10 max-w-7xl">
     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-8">
       <div>
         <h1 class="font-display text-3xl text-ink">Events</h1>
