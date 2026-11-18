@@ -23,7 +23,7 @@ export default defineNuxtConfig({
       seedAdminEmail: process.env.SEED_ADMIN_EMAIL || 'admin@tabulation.local',
       supabaseUrl: process.env.SUPABASE_URL,
       serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY,
-      tradeMarkText: process.env.TRADEMARK_TEXT || 'Nuxt · Prisma · PostgreSQL',
+      tradeMarkText: process.env.TRADEMARK_TEXT || '© 2026 Ormoc Otaku Guild™',
     },
     session: {
       cookie: {
