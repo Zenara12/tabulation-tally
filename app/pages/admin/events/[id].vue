@@ -107,6 +107,10 @@
 
     <!-- Contestants -->
     <div v-else-if="activeTab === 'Contestants'" class="space-y-5">
+      <AppButton color="ink" size="sm" class="px-0" @click="shuffleContestants" :disabled="statusModel !== 'DRAFT' || genLoading">
+        Shuffle
+        <Icon name="lucide:shuffle" class="h-4 w-4" aria-hidden="true" />
+      </AppButton>
       <AdminDataTable
         :columns="contestantTableColumns"
         :rows="contestants"
@@ -333,6 +337,7 @@ const { data: allUsers } = await useFetch('/api/users')
 
 const tabs = ['Criteria', 'Contestants', 'Judges', 'Results'] as const
 const activeTab = ref<typeof tabs[number]>('Criteria')
+const genLoading = ref(false)
 
 const statusModel = ref(event.value?.status ?? 'DRAFT')
 watch(event, (v) => { if (v) statusModel.value = v.status })
@@ -656,6 +661,34 @@ async function addContestant() {
 
 async function deleteContestant(id: string) {
   requestConfirmation('contestant', id)
+}
+
+const shuffleContestants = async() => {
+  const contestantLength = contestants.value.length;
+  if (contestantLength < 2) return;
+
+  // 1. Create an array with exact numbers: [1, 2, ..., contestantLength]
+  let shuffledNumbers:number[] = Array.from({ length: contestantLength }, (_, i) => i + 1);
+  let contestantNewNumber: { id: string; newNumber: number }[] = [];
+  // 2. Shuffle in place so every number appears strictly once
+  for (let i = shuffledNumbers.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffledNumbers[i], shuffledNumbers[j]] = [shuffledNumbers[j]!, shuffledNumbers[i]!];
+  }
+
+  contestants.value.forEach((contestant, index) => {
+    contestantNewNumber.push({ id: contestant.id, newNumber: shuffledNumbers[index] });
+  });
+  try {
+    genLoading.value = true
+    await $fetch(`/api/events/${eventId}/contestants`, { method: 'PUT', body: { contestants: contestantNewNumber } })
+    refreshEvent()
+  }
+  catch (error) {
+    console.error('Error shuffling contestants:', error);
+  } finally {
+    genLoading.value = false
+  }
 }
 
 // Judges
